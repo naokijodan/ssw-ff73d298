@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>店舗せどりウォッチ</title>
+<style>
+:root{
+  --bg:#F3F5F7; --surface:#FFFFFF; --ink:#1B2330; --muted:#5A6474;
+  --line:#E2E6EB; --accent:#D7263D; --indigo:#2B4C8C; --amber:#B26E0A;
+  --green:#2E7D5B; --purple:#7B4FA6; --tint:#EDF0F4;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#12161E; --surface:#1A202B; --ink:#E8EBF0; --muted:#98A2B3;
+    --line:#2A3140; --accent:#F0455C; --indigo:#8CA9E0; --amber:#E0A44B;
+    --green:#5CB48E; --purple:#B08BD8; --tint:#232A37;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161E; --surface:#1A202B; --ink:#E8EBF0; --muted:#98A2B3;
+  --line:#2A3140; --accent:#F0455C; --indigo:#8CA9E0; --amber:#E0A44B;
+  --green:#5CB48E; --purple:#B08BD8; --tint:#232A37;
+}
+:root[data-theme="light"]{
+  --bg:#F3F5F7; --surface:#FFFFFF; --ink:#1B2330; --muted:#5A6474;
+  --line:#E2E6EB; --accent:#D7263D; --indigo:#2B4C8C; --amber:#B26E0A;
+  --green:#2E7D5B; --purple:#7B4FA6; --tint:#EDF0F4;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+  font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+a{color:inherit; text-decoration:none}
+.num{font-variant-numeric:tabular-nums}
+.mast{background:var(--surface); border-bottom:1px solid var(--line)}
+.mast-in{max-width:1280px; margin:0 auto; padding:14px 16px;
+  display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 16px}
+.brand{font-size:22px; font-weight:800; letter-spacing:.02em}
+.brand b{color:var(--accent)}
+.today{color:var(--muted); font-size:12.5px}
+.count{margin-left:auto; font-size:12.5px; color:var(--muted)}
+.count b{color:var(--ink); font-size:15px}
+.wrap{max-width:1280px; margin:0 auto; padding:16px 16px 60px}
+
+.cattabs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px}
+.cattabs button{appearance:none; font-family:inherit; cursor:pointer; font-size:13px;
+  font-weight:700; padding:6px 14px; border-radius:999px; border:1px solid var(--line);
+  background:var(--surface); color:var(--ink)}
+.cattabs button.on{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.cattabs button .n{color:var(--muted); font-weight:600; margin-left:3px}
+.cattabs button.on .n{color:var(--bg); opacity:.75}
+
+.filterbar{background:var(--surface); border:1px solid var(--line); border-radius:8px;
+  padding:12px 14px; margin-bottom:14px; display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center}
+.filterbar input[type=text]{font-family:inherit; font-size:13px; padding:7px 10px;
+  border-radius:6px; border:1px solid var(--line); background:var(--surface); color:var(--ink);
+  min-width:220px; flex:1 1 220px}
+.filterbar select{font-family:inherit; font-size:13px; padding:7px 10px;
+  border-radius:6px; border:1px solid var(--line); background:var(--surface); color:var(--ink)}
+.filterbar label{font-size:12px; color:var(--muted); font-weight:700; display:flex; align-items:center; gap:6px}
+.fb-reset{appearance:none; font-family:inherit; cursor:pointer; font-size:12px; font-weight:700;
+  padding:5px 12px; border-radius:999px; border:1px solid var(--accent); background:var(--surface); color:var(--accent)}
+.fb-reset:hover{background:var(--accent); color:#fff}
+.fb-summary{font-size:12px; color:var(--muted); width:100%}
+.fb-summary b{color:var(--ink)}
+
+.note-box{font-size:12px; color:var(--muted); background:var(--tint); border:1px solid var(--line);
+  border-radius:8px; padding:10px 12px; margin-bottom:14px}
+.note-box b{color:var(--ink)}
+
+.tblwrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:1400px; font-size:12.5px}
+thead th{position:sticky; top:0; background:var(--tint); color:var(--muted); z-index:1;
+  text-align:left; padding:8px 10px; font-weight:700; white-space:nowrap; border-bottom:1px solid var(--line);
+  cursor:pointer; user-select:none}
+thead th:hover{color:var(--ink)}
+thead th .arrow{margin-left:3px; color:var(--indigo); font-weight:900}
+tbody td{padding:7px 10px; border-bottom:1px solid var(--line); white-space:nowrap; vertical-align:top}
+tbody tr:hover{background:var(--tint)}
+tbody tr.up{background:rgba(46,125,91,.10)}
+tbody tr.down{background:rgba(215,38,61,.10)}
+tbody tr.up:hover{background:rgba(46,125,91,.18)}
+tbody tr.down:hover{background:rgba(215,38,61,.18)}
+td.name{white-space:normal; min-width:180px; font-weight:700}
+td.note{white-space:normal; color:var(--muted); max-width:220px}
+.chip{display:inline-block; padding:1px 7px; border-radius:3px; font-size:11px;
+  font-weight:700; line-height:1.7; white-space:nowrap}
+.chip.cat{color:var(--muted); border:1px solid var(--line); font-weight:700}
+.chip.pct-up{color:#fff; background:var(--green)}
+.chip.pct-down{color:#fff; background:var(--accent)}
+.chip.judge-buy{color:#fff; background:var(--indigo)}
+.chip.judge-list{color:#fff; background:var(--green)}
+.chip.judge-pass{color:var(--muted); border:1px solid var(--line)}
+.srch{display:block; white-space:nowrap}
+.srch a{color:var(--indigo); font-weight:700; margin-right:8px}
+.srch a:hover{text-decoration:underline}
+.empty{padding:40px 16px; text-align:center; color:var(--muted)}
+footer{max-width:1280px; margin:20px auto 0; padding:0 16px; color:var(--muted); font-size:11.5px}
+@media(max-width:560px){
+  .filterbar input[type=text]{min-width:0; width:100%}
+  .count{margin-left:0; width:100%}
+}
+</style>
+</head>
+<body>
+<header class="mast">
+  <div class="mast-in">
+    <div class="brand"><b>店舗</b>せどりウォッチ</div>
+    <div class="today">最終更新: 2026-09-03（木）00:25 JST</div>
+    <div class="count">候補 <b id="countNum">6</b> 件</div>
+  </div>
+</header>
+<div class="wrap">
+  <div class="cattabs" id="cattabs"></div>
+  <div class="filterbar">
+    <label>キーワード
+      <input type="text" id="kwInput" placeholder="商品名・メーカー・JAN・仕入店舗・備考">
+    </label>
+    <label>判定
+      <select id="judgeSelect">
+        <option value="">すべて</option>
+        <option value="候補">候補</option>
+        <option value="出品">出品</option>
+        <option value="見送り">見送り</option>
+        <option value="__blank__">未判定</option>
+      </select>
+    </label>
+    <button class="fb-reset" id="resetBtn" type="button">条件クリア</button>
+    <div class="fb-summary" id="fbSummary"></div>
+  </div>
+  <div class="note-box">
+    「eBay出品数(JP)」は台帳に保存されているJPセラー比率から算出した概算値です（全体件数×JPセラー比率）。
+    店頭価格・粗利見込みは非公開ページのみ表示します（既定では表示していません）。
+    行が緑／赤で強調されている場合、前回実行時点からeBay出品数が±30%以上変化しています。
+  </div>
+  <div class="tblwrap">
+    <table id="tbl">
+      <thead><tr id="theadRow"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="empty" id="emptyMsg" hidden>該当する候補がありません。</div>
+</div>
+<footer>店舗せどりウォッチ（自動生成ページ）。eBayの出品数・価格はBrowse APIの目安値です。実際の販売可否は台帳「判定」欄を確認してください。</footer>
+<script>
+const DATA = [{"category": "A", "category_label": "トレカサプライ", "name": "Japanese card sleeves", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 46909, "ebay_total_jp": 29553, "jp_seller_ratio": 0.63, "ebay_min_usd": 2.49, "ebay_median_usd": 10.77, "quantity_sold_sample": 60, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:Japanese card sleeves|japanese card sleeves", "search_term": "japanese card sleeves", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "Deck case Japan", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 5284, "ebay_total_jp": 3905, "jp_seller_ratio": 0.739, "ebay_min_usd": 7.99, "ebay_median_usd": 35.5, "quantity_sold_sample": 0, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:Deck case Japan|deck case japan", "search_term": "deck case japan", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "Card loader Japan", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 1318, "ebay_total_jp": 432, "jp_seller_ratio": 0.3278, "ebay_min_usd": 3, "ebay_median_usd": 42.5, "quantity_sold_sample": 0, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:Card loader Japan|card loader japan", "search_term": "card loader japan", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "Pokemon Center sleeves", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 6801, "ebay_total_jp": 2556, "jp_seller_ratio": 0.3758, "ebay_min_usd": 0.99, "ebay_median_usd": 18.99, "quantity_sold_sample": 14, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:Pokemon Center sleeves|pokemon center sleeves", "search_term": "pokemon center sleeves", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "KMC sleeves", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 806, "ebay_total_jp": 216, "jp_seller_ratio": 0.268, "ebay_min_usd": 6.95, "ebay_median_usd": 16.62, "quantity_sold_sample": 521, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:KMC sleeves|kmc sleeves", "search_term": "kmc sleeves", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "Broccoli sleeves", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 2662, "ebay_total_jp": 1840, "jp_seller_ratio": 0.6912, "ebay_min_usd": 9.49, "ebay_median_usd": 19.49, "quantity_sold_sample": 46, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:Broccoli sleeves|broccoli sleeves", "search_term": "broccoli sleeves", "change_pct": null}];
+const SHOW_PRIVATE = false;
+
+const COLUMNS = [
+  {key:"category_label", label:"系統", type:"str"},
+  {key:"name", label:"商品名", type:"str", cls:"name"},
+  {key:"maker", label:"メーカー", type:"str"},
+  {key:"jan", label:"JAN", type:"str"},
+  {key:"store", label:"仕入店舗", type:"str"},
+  {key:"availability", label:"補充性", type:"str"},
+  {key:"weight_g", label:"重量(g)", type:"num"},
+  {key:"ebay_total", label:"eBay出品数(全体)", type:"num"},
+  {key:"ebay_total_jp", label:"eBay出品数(JP概算)", type:"num"},
+  {key:"jp_seller_ratio", label:"JPセラー比率", type:"pct"},
+  {key:"ebay_min_usd", label:"eBay最安USD", type:"usd"},
+  {key:"ebay_median_usd", label:"eBay中央値USD", type:"usd"},
+  {key:"quantity_sold_sample", label:"売れ数サンプル", type:"num"},
+];
+if(SHOW_PRIVATE){
+  COLUMNS.push({key:"store_price", label:"店頭価格(円)", type:"jpy"});
+  COLUMNS.push({key:"gross_margin_jpy", label:"粗利見込み(円)", type:"jpy"});
+}
+COLUMNS.push({key:"judgment", label:"判定", type:"judge"});
+COLUMNS.push({key:"first_detected", label:"初回検出日", type:"str"});
+COLUMNS.push({key:"last_updated", label:"最終更新日", type:"str"});
+COLUMNS.push({key:"__links__", label:"リンク", type:"links", nosort:true});
+
+let sortKey = "ebay_total";
+let sortDir = -1; // 降順スタート
+let activeCat = "";
+let judgeFilter = "";
+let keyword = "";
+
+function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+function extractEbayQuery(title){
+  const tokens = (title || "").match(/[A-Za-z0-9!'&.-]+/g) || [];
+  const filtered = tokens.filter(t => t.length >= 2);
+  if(filtered.length > 0) return filtered.join(" ");
+  return (title || "").slice(0, 40);
+}
+function ebaySearchUrl(item){
+  const eq = encodeURIComponent(item.search_term ? item.search_term : extractEbayQuery(item.name));
+  return `https://www.ebay.com/sch/i.html?_nkw=${eq}&LH_ItemCondition=1000`;
+}
+function terapeakUrl(item){
+  const eq = encodeURIComponent(item.search_term ? item.search_term : extractEbayQuery(item.name));
+  return `https://www.ebay.com/sh/research?keywords=${eq}&marketplace=EBAY-US&tabName=SOLD`;
+}
+
+function fmtNum(v){ return (v===null||v===undefined||v==="") ? "" : Number(v).toLocaleString(); }
+function fmtUsd(v){ return (v===null||v===undefined||v==="") ? "" : "$" + Number(v).toFixed(2); }
+function fmtJpy(v){ return (v===null||v===undefined||v==="") ? "" : "¥" + Math.round(Number(v)).toLocaleString(); }
+function fmtPct(v){ return (v===null||v===undefined||v==="") ? "" : (Number(v)*100).toFixed(1) + "%"; }
+
+function cellHtml(item, col){
+  const v = item[col.key];
+  if(col.key === "__links__"){
+    return `<span class="srch"><a href="${ebaySearchUrl(item)}" target="_blank" rel="noopener">eBay検索</a><a href="${terapeakUrl(item)}" target="_blank" rel="noopener">Terapeak</a></span>`;
+  }
+  if(col.key === "category_label"){
+    return `<span class="chip cat">${esc(item.category || "")} ${esc(v||"")}</span>`;
+  }
+  if(col.type === "num") return `<span class="num">${fmtNum(v)}</span>`;
+  if(col.type === "usd") return `<span class="num">${fmtUsd(v)}</span>`;
+  if(col.type === "jpy") return `<span class="num">${fmtJpy(v)}</span>`;
+  if(col.type === "pct") return `<span class="num">${fmtPct(v)}</span>`;
+  if(col.type === "judge"){
+    if(!v) return "";
+    const cls = v === "出品" ? "judge-list" : (v === "見送り" ? "judge-pass" : "judge-buy");
+    return `<span class="chip ${cls}">${esc(v)}</span>`;
+  }
+  return esc(v);
+}
+
+function rowClass(item){
+  if(item.change_pct === null || item.change_pct === undefined) return "";
+  if(item.change_pct >= 0.30) return "up";
+  if(item.change_pct <= -0.30) return "down";
+  return "";
+}
+
+function changeBadge(item){
+  if(item.change_pct === null || item.change_pct === undefined) return "";
+  if(item.change_pct >= 0.30) return `<span class="chip pct-up">▲${(item.change_pct*100).toFixed(0)}%</span>`;
+  if(item.change_pct <= -0.30) return `<span class="chip pct-down">▼${(item.change_pct*100).toFixed(0)}%</span>`;
+  return "";
+}
+
+function renderHead(){
+  const tr = document.getElementById("theadRow");
+  tr.innerHTML = COLUMNS.map(col => {
+    const arrow = (col.key === sortKey) ? `<span class="arrow">${sortDir === 1 ? "▲" : "▼"}</span>` : "";
+    return `<th data-key="${col.key}" data-sortable="${col.nosort ? "0" : "1"}">${esc(col.label)}${arrow}</th>`;
+  }).join("");
+  tr.querySelectorAll("th").forEach(th => {
+    if(th.dataset.sortable === "0") return;
+    th.addEventListener("click", () => {
+      const key = th.dataset.key;
+      if(sortKey === key){ sortDir = -sortDir; } else { sortKey = key; sortDir = 1; }
+      render();
+    });
+  });
+}
+
+function currentData(){
+  return DATA.filter(item => {
+    if(activeCat && item.category !== activeCat) return false;
+    if(judgeFilter){
+      if(judgeFilter === "__blank__"){ if(item.judgment) return false; }
+      else if(item.judgment !== judgeFilter) return false;
+    }
+    if(keyword){
+      const hay = [item.name, item.maker, item.jan, item.store, item.note].join(" ").toLowerCase();
+      if(hay.indexOf(keyword) === -1) return false;
+    }
+    return true;
+  });
+}
+
+function sortData(list){
+  const col = COLUMNS.find(c => c.key === sortKey);
+  const type = col ? col.type : "str";
+  return list.slice().sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if(type === "num" || type === "usd" || type === "jpy" || type === "pct"){
+      av = (av === null || av === undefined || av === "") ? -Infinity : Number(av);
+      bv = (bv === null || bv === undefined || bv === "") ? -Infinity : Number(bv);
+      return (av - bv) * sortDir;
+    }
+    av = (av || "").toString();
+    bv = (bv || "").toString();
+    return av.localeCompare(bv, "ja") * sortDir;
+  });
+}
+
+function renderCattabs(){
+  const counts = {};
+  DATA.forEach(it => { counts[it.category] = (counts[it.category]||0) + 1; });
+  const cats = Object.keys(counts).sort();
+  const box = document.getElementById("cattabs");
+  let html = `<button data-cat="" class="${activeCat===""?"on":""}">すべて<span class="n">${DATA.length}</span></button>`;
+  html += cats.map(c => {
+    const label = (DATA.find(it=>it.category===c)||{}).category_label || c;
+    return `<button data-cat="${esc(c)}" class="${activeCat===c?"on":""}">${esc(c)}：${esc(label)}<span class="n">${counts[c]}</span></button>`;
+  }).join("");
+  box.innerHTML = html;
+  box.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => { activeCat = btn.dataset.cat; render(); });
+  });
+}
+
+function render(){
+  renderCattabs();
+  renderHead();
+  const filtered = sortData(currentData());
+  const tbody = document.getElementById("tbody");
+  const emptyMsg = document.getElementById("emptyMsg");
+  if(filtered.length === 0){
+    tbody.innerHTML = "";
+    emptyMsg.hidden = false;
+  } else {
+    emptyMsg.hidden = true;
+    tbody.innerHTML = filtered.map(item => {
+      const cells = COLUMNS.map(col => {
+        let inner = cellHtml(item, col);
+        if(col.key === "ebay_total") inner += " " + changeBadge(item);
+        return `<td class="${col.cls||""}">${inner}</td>`;
+      }).join("");
+      return `<tr class="${rowClass(item)}">${cells}</tr>`;
+    }).join("");
+  }
+  document.getElementById("fbSummary").innerHTML = `<b>${filtered.length}</b> / ${DATA.length} 件を表示中`;
+  document.getElementById("countNum").textContent = DATA.length;
+}
+
+document.getElementById("kwInput").addEventListener("input", (e) => {
+  keyword = e.target.value.trim().toLowerCase();
+  render();
+});
+document.getElementById("judgeSelect").addEventListener("change", (e) => {
+  judgeFilter = e.target.value;
+  render();
+});
+document.getElementById("resetBtn").addEventListener("click", () => {
+  activeCat = ""; judgeFilter = ""; keyword = "";
+  document.getElementById("kwInput").value = "";
+  document.getElementById("judgeSelect").value = "";
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
