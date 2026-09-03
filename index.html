@@ -72,32 +72,45 @@ a{color:inherit; text-decoration:none}
   border-radius:8px; padding:10px 12px; margin-bottom:14px}
 .note-box b{color:var(--ink)}
 
-.tblwrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:var(--surface)}
-table{border-collapse:collapse; width:100%; min-width:1400px; font-size:12.5px}
-thead th{position:sticky; top:0; background:var(--tint); color:var(--muted); z-index:1;
-  text-align:left; padding:8px 10px; font-weight:700; white-space:nowrap; border-bottom:1px solid var(--line);
-  cursor:pointer; user-select:none}
-thead th:hover{color:var(--ink)}
-thead th .arrow{margin-left:3px; color:var(--indigo); font-weight:900}
-tbody td{padding:7px 10px; border-bottom:1px solid var(--line); white-space:nowrap; vertical-align:top}
-tbody tr:hover{background:var(--tint)}
-tbody tr.up{background:rgba(46,125,91,.10)}
-tbody tr.down{background:rgba(215,38,61,.10)}
-tbody tr.up:hover{background:rgba(46,125,91,.18)}
-tbody tr.down:hover{background:rgba(215,38,61,.18)}
-td.name{white-space:normal; min-width:180px; font-weight:700}
-td.note{white-space:normal; color:var(--muted); max-width:220px}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:8px; overflow:hidden;
+  display:flex; flex-direction:column; transition:transform .12s ease, box-shadow .12s ease}
+@media(prefers-reduced-motion:no-preference){
+  .card:hover{transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.10)}
+}
+.card.up{outline:2px solid var(--green)}
+.card.down{outline:2px solid var(--accent)}
+.card .imgbox{position:relative; aspect-ratio:1/1; background:var(--tint)}
+.card .imgbox img{width:100%; height:100%; object-fit:contain; display:block}
+.card .bdg{position:absolute; top:8px; left:8px; display:flex; flex-direction:column; gap:4px; align-items:flex-start}
+.card .body{padding:10px 12px 12px; display:flex; flex-direction:column; gap:5px; flex:1}
+.card .t{font-size:13px; font-weight:700; line-height:1.4;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+.card .mk{font-size:11.5px; color:var(--muted)}
+.card .foot{display:flex; justify-content:space-between; align-items:baseline}
+.card .dt{font-size:12px; color:var(--muted)}
+.card .pr{font-size:14px; font-weight:800}
+.card .ebayrow{font-size:11.5px; color:var(--muted); border-top:1px solid var(--line); padding-top:6px}
+.card .ebayrow b{color:var(--ink)}
+.card .toplist{display:flex; flex-direction:column; gap:2px; font-size:11px}
+.card .toplist a{color:var(--indigo); font-weight:600}
+.card .toplist a:hover{text-decoration:underline}
+.card .toplist .p{color:var(--muted); margin-left:4px}
+.card .private{font-size:11.5px; color:var(--purple); border-top:1px dashed var(--line); padding-top:6px}
+.card .note{font-size:11px; color:var(--muted); white-space:pre-wrap}
+.card .srch{margin-top:2px}
+.card .srch a{color:var(--indigo); font-weight:700; margin-right:8px; font-size:11.5px}
+.card .srch a:hover{text-decoration:underline}
+
 .chip{display:inline-block; padding:1px 7px; border-radius:3px; font-size:11px;
   font-weight:700; line-height:1.7; white-space:nowrap}
-.chip.cat{color:var(--muted); border:1px solid var(--line); font-weight:700}
+.chip.cat{color:#fff; background:var(--indigo)}
+.chip.new{color:#fff; background:var(--accent)}
 .chip.pct-up{color:#fff; background:var(--green)}
 .chip.pct-down{color:#fff; background:var(--accent)}
 .chip.judge-buy{color:#fff; background:var(--indigo)}
 .chip.judge-list{color:#fff; background:var(--green)}
-.chip.judge-pass{color:var(--muted); border:1px solid var(--line)}
-.srch{display:block; white-space:nowrap}
-.srch a{color:var(--indigo); font-weight:700; margin-right:8px}
-.srch a:hover{text-decoration:underline}
+.chip.judge-pass{color:var(--muted); border:1px solid var(--line); background:var(--surface)}
 .empty{padding:40px 16px; text-align:center; color:var(--muted)}
 footer{max-width:1280px; margin:20px auto 0; padding:0 16px; color:var(--muted); font-size:11.5px}
 @media(max-width:560px){
@@ -110,15 +123,18 @@ footer{max-width:1280px; margin:20px auto 0; padding:0 16px; color:var(--muted);
 <header class="mast">
   <div class="mast-in">
     <div class="brand"><b>店舗</b>せどりウォッチ</div>
-    <div class="today">最終更新: 2026-09-03（木）07:30 JST</div>
-    <div class="count">候補 <b id="countNum">6</b> 件</div>
+    <div class="today">最終更新: 2026-09-03（木）10:23 JST</div>
+    <div class="count">商品 <b id="countNum">28</b> 件</div>
   </div>
 </header>
 <div class="wrap">
   <div class="cattabs" id="cattabs"></div>
   <div class="filterbar">
     <label>キーワード
-      <input type="text" id="kwInput" placeholder="商品名・メーカー・JAN・仕入店舗・備考">
+      <input type="text" id="kwInput" placeholder="商品名・メーカー・JAN・収集元・備考">
+    </label>
+    <label>収集元
+      <select id="sourceSelect"><option value="">すべて</option></select>
     </label>
     <label>判定
       <select id="judgeSelect">
@@ -129,138 +145,135 @@ footer{max-width:1280px; margin:20px auto 0; padding:0 16px; color:var(--muted);
         <option value="__blank__">未判定</option>
       </select>
     </label>
+    <label>並び替え
+      <select id="sortSelect">
+        <option value="first_detected:desc">新着順</option>
+        <option value="ebay_median_usd:desc">eBay中央値USD（高い順）</option>
+        <option value="ebay_median_usd:asc">eBay中央値USD（低い順）</option>
+        <option value="jp_seller_ratio:desc">JPセラー比率（高い順）</option>
+        <option value="jp_seller_ratio:asc">JPセラー比率（低い順）</option>
+        <option value="ebay_total:desc">eBay出品数（多い順）</option>
+        <option value="ebay_total:asc">eBay出品数（少ない順）</option>
+        <option value="release_date:desc">発売日（新しい順）</option>
+        <option value="release_date:asc">発売日（古い順）</option>
+      </select>
+    </label>
     <button class="fb-reset" id="resetBtn" type="button">条件クリア</button>
     <div class="fb-summary" id="fbSummary"></div>
   </div>
   <div class="note-box">
-    「eBay出品数(JP)」は台帳に保存されているJPセラー比率から算出した概算値です（全体件数×JPセラー比率）。
+    「本日新規」バッジは初回検出日が本日のものです。カード枠が緑／赤の場合、
+    前回実行時点からeBay出品数(全体)が±30%以上変化しています。
     店頭価格・粗利見込みは非公開ページのみ表示します（既定では表示していません）。
-    行が緑／赤で強調されている場合、前回実行時点からeBay出品数が±30%以上変化しています。
+    eBay上位1〜3は実際の出品リンクです（クリックでeBayの商品ページを開きます）。
   </div>
-  <div class="tblwrap">
-    <table id="tbl">
-      <thead><tr id="theadRow"></tr></thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
-  <div class="empty" id="emptyMsg" hidden>該当する候補がありません。</div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="emptyMsg" hidden>該当する商品がありません。</div>
 </div>
 <footer>店舗せどりウォッチ（自動生成ページ）。eBayの出品数・価格はBrowse APIの目安値です。実際の販売可否は台帳「判定」欄を確認してください。</footer>
 <script>
-const DATA = [{"category": "A", "category_label": "トレカサプライ", "name": "Japanese card sleeves", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 46697, "ebay_total_jp": 29400, "jp_seller_ratio": 0.6296, "ebay_min_usd": 2.49, "ebay_median_usd": 10.77, "quantity_sold_sample": null, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:Japanese card sleeves|japanese card sleeves", "search_term": "japanese card sleeves", "change_pct": -0.0045}, {"category": "A", "category_label": "トレカサプライ", "name": "Deck case Japan", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 5132, "ebay_total_jp": 3830, "jp_seller_ratio": 0.7463, "ebay_min_usd": 7.99, "ebay_median_usd": 35, "quantity_sold_sample": null, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:Deck case Japan|deck case japan", "search_term": "deck case japan", "change_pct": -0.0288}, {"category": "A", "category_label": "トレカサプライ", "name": "Card loader Japan", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 1321, "ebay_total_jp": 432, "jp_seller_ratio": 0.327, "ebay_min_usd": 10, "ebay_median_usd": 49.99, "quantity_sold_sample": null, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:Card loader Japan|card loader japan", "search_term": "card loader japan", "change_pct": 0.0023}, {"category": "A", "category_label": "トレカサプライ", "name": "Pokemon Center sleeves", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 6769, "ebay_total_jp": 2551, "jp_seller_ratio": 0.3769, "ebay_min_usd": 0.99, "ebay_median_usd": 18.99, "quantity_sold_sample": null, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:Pokemon Center sleeves|pokemon center sleeves", "search_term": "pokemon center sleeves", "change_pct": -0.0047}, {"category": "A", "category_label": "トレカサプライ", "name": "KMC sleeves", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 830, "ebay_total_jp": 240, "jp_seller_ratio": 0.2892, "ebay_min_usd": 5.29, "ebay_median_usd": 16.11, "quantity_sold_sample": null, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:KMC sleeves|kmc sleeves", "search_term": "kmc sleeves", "change_pct": 0.0298}, {"category": "A", "category_label": "トレカサプライ", "name": "Broccoli sleeves", "maker": "", "jan": "", "store": "", "availability": "未確認", "weight_g": null, "ebay_total": 2622, "ebay_total_jp": 1823, "jp_seller_ratio": 0.6953, "ebay_min_usd": 9.49, "ebay_median_usd": 18.99, "quantity_sold_sample": null, "judgment": "", "first_detected": "2026-09-03", "last_updated": "2026-09-03", "source_url": "", "note": "サンプル・要差し替え", "key": "nk:Broccoli sleeves|broccoli sleeves", "search_term": "broccoli sleeves", "change_pct": -0.015}];
+const DATA = [{"category": "A", "category_label": "トレカサプライ", "name": "【新商品】合皮製デッキケース コードギアス 反逆のルルーシュ [2026年12月19日(土)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/261219_lgeass_deckcase/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/07/4510417704676_t.jpg", "release_date": "46375", "price_jpy": 4180, "store": "", "availability": "", "weight_g": null, "search_term": "Code Geass Lelouch of the Rebellion leather deck case", "ebay_total": 60, "ebay_total_jp": 57, "jp_seller_ratio": 0.95, "ebay_min_usd": 28.47, "ebay_median_usd": 62.98, "ebay_top_items": [{"title": "Synthetic Leather Deck Case Code Geass: Lelouch of the Rebellion \"Kallen\"", "price_usd": 50.0, "url": "https://www.ebay.com/itm/146007466679?_skw=Code+Geass+Lelouch+of+the+Rebellion+leather+deck+case&hash=item21feb922b7:g:49EAAOSwTT9m21eF"}, {"title": "Synthetic Leather Deck Case Code Geass: Lelouch of REBELlion Black Knights Reviv", "price_usd": 78.37, "url": "https://www.ebay.com/itm/167883879830?_skw=Code+Geass+Lelouch+of+the+Rebellion+leather+deck+case&hash=item2716a8b596:g:dqUAAeSw0fJql8ni&amdata=enc%3AAQALAAABEACCtXRWQnOEpyOqnQQ8KGbo3YhuZUxVbzXPcQv0%2Bkxg%2BBkRftkw1IRXfpFPGSG9azcXSAUXOSx%2BT8cb%2Fipt5pyKCU1yL%2BDlTEswzHM%2B090duWlFBHj%2F7fIpOO5%2FfVYisqslzzc9YWQ7Uu0eauW%2BdFrpXDtShjOBTZOUxKencayFSlGastc5OvTV0RG98tk15gSmIYa0o6w5wFMwVnid5Cy6jf%2BW8gl5MrUC8rNlQpqieLatwVZur%2BA%2BmobyCiSfXqtrl9DqWBDl%2FZGoEVxiGGvzJzpvHvAuzdxuvOKTjfmJCPmsk8Oqxx4Fgi7dSfSa5mhSFRw%2F9HtiA%2F6XobxAUHLf%2FU48DoX%2BM72loYYhoBbd"}, {"title": "BROCCOLI Code Geass: Lelouch of Rebellion C.C. (C2) Synthetic Leather Deck Case", "price_usd": 89.69, "url": "https://www.ebay.com/itm/286861084337?_skw=Code+Geass+Lelouch+of+the+Rebellion+leather+deck+case&hash=item42ca40c6b1:g:NmYAAeSwI11o46C9"}], "quantity_sold_sample": 2, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/261219_lgeass_deckcase/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】合皮製デッキケースＷ コードギアス 反逆のルルーシュ「C.C.」Ver.3 [2026年12月12日(土)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/261212_lgeass_leather_deckcase_w/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/07/4510417702931_t.jpg", "release_date": "46368", "price_jpy": 5280, "store": "", "availability": "", "weight_g": null, "search_term": "Code Geass C.C. Ver.3 leather deck case W", "ebay_total": 55, "ebay_total_jp": 52, "jp_seller_ratio": 0.9455, "ebay_min_usd": 28.47, "ebay_median_usd": 66.22, "ebay_top_items": [{"title": "Synthetic leather deck case Code Geass: Lelouch of Rebellion \"C.C.\" USA Seller", "price_usd": 60.0, "url": "https://www.ebay.com/itm/146007458159?_skw=Code+Geass+C.C.+Ver.3+leather+deck+case+W&hash=item21feb9016f:g:XUwAAOSwnLZm21ZX"}, {"title": "Synthetic Leather Deck Case Code Geass: Lelouch of the Rebellion \"Kallen\"", "price_usd": 50.0, "url": "https://www.ebay.com/itm/146007466679?_skw=Code+Geass+C.C.+Ver.3+leather+deck+case+W&hash=item21feb922b7:g:49EAAOSwTT9m21eF"}, {"title": "BROCCOLI Code Geass: Lelouch of Rebellion C.C. (C2) Synthetic Leather Deck Case", "price_usd": 89.69, "url": "https://www.ebay.com/itm/286861084337?_skw=Code+Geass+C.C.+Ver.3+leather+deck+case+W&hash=item42ca40c6b1:g:NmYAAeSwI11o46C9"}], "quantity_sold_sample": 2, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/261212_lgeass_leather_deckcase_w/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】キャラクターデッキケースMAX NEO コードギアス 反逆のルルーシュ [2026年11月14日(土)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/261114_lgeass_deckcase-max-neo/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/07/4510417702870_t.jpg", "release_date": "46340", "price_jpy": 990, "store": "", "availability": "", "weight_g": null, "search_term": "Code Geass Lelouch of the Rebellion deck case MAX NEO", "ebay_total": 39, "ebay_total_jp": 36, "jp_seller_ratio": 0.9231, "ebay_min_usd": 28.47, "ebay_median_usd": 63.4, "ebay_top_items": [{"title": "Card Deck Case MAX NEO CODE GEASS Lelouch of the Rebellion \"C.C.\" Revival", "price_usd": 28.47, "url": "https://www.ebay.com/itm/236987026823?_skw=Code+Geass+Lelouch+of+the+Rebellion+deck+case+MAX+NEO&hash=item372d870d87:g:2DQAAeSwRHNql-Z1"}, {"title": "Character Card Deck Case MAX NEO CODE GEASS Lelouch of the Rebellion \"Lelouch\"", "price_usd": 32.61, "url": "https://www.ebay.com/itm/336728719837?_skw=Code+Geass+Lelouch+of+the+Rebellion+deck+case+MAX+NEO&hash=item4e669881dd:g:3TsAAeSwhPJqmLKN"}, {"title": "Synthetic leather deck case Code Geass: Lelouch of Rebellion \"C.C.\" USA Seller", "price_usd": 60.0, "url": "https://www.ebay.com/itm/146007458159?_skw=Code+Geass+Lelouch+of+the+Rebellion+deck+case+MAX+NEO&hash=item21feb9016f:g:XUwAAOSwnLZm21ZX"}], "quantity_sold_sample": 1, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/261114_lgeass_deckcase-max-neo/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】ブロッコリーキャラクタースリーブ コードギアス 反逆のルルーシュ [2026年11月14日(土)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/261114_lgeass_charactersleeve/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/07/4510417702832_t.jpg", "release_date": "46340", "price_jpy": 1320, "store": "", "availability": "", "weight_g": null, "search_term": "Broccoli character sleeves Code Geass Lelouch of the Rebellion", "ebay_total": 95, "ebay_total_jp": 84, "jp_seller_ratio": 0.8842, "ebay_min_usd": 17.95, "ebay_median_usd": 44.21, "ebay_top_items": [{"title": "BROCCOLI CHARACTER SLEEVE CODE GEASS LELOUCH OF THE REBELLION C.C. REVIVAL", "price_usd": 25.0, "url": "https://www.ebay.com/itm/178109204533?_skw=Broccoli+character+sleeves+Code+Geass+Lelouch+of+the+Rebellion&hash=item297822c835:g:lecAAeSwqBdp-qfn"}, {"title": "Broccoli Character Code Geass: Lelouch of the Rebellion Lelouch Card Sleeves", "price_usd": 20.0, "url": "https://www.ebay.com/itm/198160605796?_skw=Broccoli+character+sleeves+Code+Geass+Lelouch+of+the+Rebellion&hash=item2e234ae264:g:wBUAAeSwmUtpquyz"}, {"title": "Broccoli Character Sleeves Code Geass Lelouch of the Rebellion Lelouch Ver.2", "price_usd": 55.23, "url": "https://www.ebay.com/itm/327304381512?_skw=Broccoli+character+sleeves+Code+Geass+Lelouch+of+the+Rebellion&hash=item4c34dc8448:g:Ir8AAeSw3lhqeoZ0"}], "quantity_sold_sample": 2, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/261114_lgeass_charactersleeve/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】キャラクターデッキケースMAX NEO 天使☆騒々 RE-BOOT! [2026年12月12日(土)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/261212_ten_sz_deckcase-max-neo/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/08/4510417706304_t.jpg", "release_date": "46368", "price_jpy": 990, "store": "", "availability": "", "weight_g": null, "search_term": "Tenshi Souzou RE-BOOT deck case MAX NEO", "ebay_total": 2, "ebay_total_jp": 2, "jp_seller_ratio": 1, "ebay_min_usd": 26.82, "ebay_median_usd": 27.61, "ebay_top_items": [{"title": "Character Card deck case MAX NEO Tenshi Souzou RE-BOOT! \"Shirayuki Noa\"", "price_usd": 28.39, "url": "https://www.ebay.com/itm/236988878019?_skw=Tenshi+Souzou+RE-BOOT+deck+case+MAX+NEO&hash=item372da34cc3:g:YjAAAeSwmKhql5nn"}, {"title": "Character Card deck case MAX NEO Tenshi Souzou RE-BOOT! \"Hoshikawa Kaguya\"", "price_usd": 26.82, "url": "https://www.ebay.com/itm/336729282218?_skw=Tenshi+Souzou+RE-BOOT+deck+case+MAX+NEO&hash=item4e66a116aa:g:ciQAAeSwdK5ql5pc"}], "quantity_sold_sample": 0, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/261212_ten_sz_deckcase-max-neo/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】ブロッコリーキャラクタースリーブ 天使☆騒々 RE-BOOT! [2026年12月12日(土)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/261212_ten_sz_charactersleeve/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/08/4510417706267_t.jpg", "release_date": "46368", "price_jpy": 1320, "store": "", "availability": "", "weight_g": null, "search_term": "Broccoli character sleeves Tenshi Souzou RE-BOOT", "ebay_total": 8, "ebay_total_jp": 8, "jp_seller_ratio": 1, "ebay_min_usd": 27.69, "ebay_median_usd": 33.73, "ebay_top_items": [{"title": "Character Card Sleeve Tenshi Souzou RE-BOOT! \"Kurumi Kohibari\"", "price_usd": 27.69, "url": "https://www.ebay.com/itm/336730572485?_skw=Broccoli+character+sleeves+Tenshi+Souzou+RE-BOOT&hash=item4e66b4c6c5:g:y4AAAeSwF-Zql6Ox"}, {"title": "Character Card Sleeve Tenshi Souzou RE-BOOT! \"Noa Shirayuki\"", "price_usd": 28.4, "url": "https://www.ebay.com/itm/336730572486?_skw=Broccoli+character+sleeves+Tenshi+Souzou+RE-BOOT&hash=item4e66b4c6c6:g:58QAAeSwjFZql6Pt"}, {"title": "Character Card Sleeve Tenshi Souzou RE-BOOT! \"Kaguya Hoshikawa\"", "price_usd": 28.4, "url": "https://www.ebay.com/itm/336730572484?_skw=Broccoli+character+sleeves+Tenshi+Souzou+RE-BOOT&hash=item4e66b4c6c4:g:zfUAAeSwVf1ql6fA"}], "quantity_sold_sample": 0, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/261212_ten_sz_charactersleeve/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】デッキケースマルチ [2026年11月20日(金)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/261120_deckcasemulti/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/08/deckcase01.jpg", "release_date": "46346", "price_jpy": 1430, "store": "", "availability": "", "weight_g": null, "search_term": "Broccoli deck case multi", "ebay_total": 4, "ebay_total_jp": 3, "jp_seller_ratio": 0.75, "ebay_min_usd": 9.99, "ebay_median_usd": 9.99, "ebay_top_items": [{"title": "Broccoli Storage Deck Box Kaiju Ex Summer Pockets Reflection Blue New Sealed", "price_usd": 9.99, "url": "https://www.ebay.com/itm/297455734383?_skw=Broccoli+deck+case+multi&hash=item4541be4e6f:g:v~MAAOSw1GZmGOqX"}, {"title": "New Jersey Deck Case Multi C-1 Prize Azur Lane 2026", "price_usd": 49.0, "url": "https://www.ebay.com/itm/398275718391?_skw=Broccoli+deck+case+multi&hash=item5cbb152cf7:g:-oMAAeSw87Bqe8C-"}, {"title": "Formidable Memory Ver. Deck Case Multi Azur Lane C Prize", "price_usd": 58.0, "url": "https://www.ebay.com/itm/398275718571?_skw=Broccoli+deck+case+multi&hash=item5cbb152dab:g:NBcAAeSwWUhqe8DK"}], "quantity_sold_sample": 0, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/261120_deckcasemulti/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】ブロッコリーインナースリーブ [2026年11月20日(金)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/261120_innersleeve/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/08/bis-01.jpg", "release_date": "46346", "price_jpy": 418, "store": "", "availability": "", "weight_g": null, "search_term": "Broccoli inner sleeves", "ebay_total": 46, "ebay_total_jp": 26, "jp_seller_ratio": 0.5652, "ebay_min_usd": 3.99, "ebay_median_usd": 15.99, "ebay_top_items": [{"title": "Broccoli 80 Sleeves Protector BSP-14 Emboss & Clear M size Standard Oversleeves", "price_usd": 11.99, "url": "https://www.ebay.com/itm/227468111539?_skw=Broccoli+inner+sleeves&hash=item34f627eeb3:g:~XcAAeSwqylqeB7n"}, {"title": "Broccoli Sleeve Protector S [BSP-01] Single Item", "price_usd": 17.18, "url": "https://www.ebay.com/itm/317867164963?_skw=Broccoli+inner+sleeves&hash=item4a025c0523:g:iJwAAeSwLxhpjF6Q&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGbsSphfQZrk0tjjUCGTL7TvD%2FhP4rMGwNZqyvV5kNgIdp%2BW9YIY6vDLk%2BW771eaS%2BbpIbaDk0Nef%2Bh1cq3BuQzLkeb%2FMKbMqEDij72ZERxitt9C5x0OEbMRAHvr1%2BOhPJST1F%2Bio0C2rOYqA%2FhS3UN0JUyYUp6u7CP15Qe%2Fymhw3naDP2alsyenCBwblUTRSEGlVU960DAyzLxu%2FGFa%2BRt2kXxyGn5ToMxlZBjB2OhInyKDDBrpiim7ObT6VUFW65UxuCNWKX0NrEuT9M%2BoV%2BXGXaX2HZlyO8%2Bz%2FCQoENjfaA%3D%3D"}, {"title": "Broccoli: 68.5mmx93mm M sized Sleeve Protector Clear & Embossed", "price_usd": 25.0, "url": "https://www.ebay.com/itm/168135303228?_skw=Broccoli+inner+sleeves&hash=item2725a5203c:g:YokAAeSw245pg50v&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGYGg0LQD70mq0rB0%2BHXcxe9nvyB4q9z5%2FbBgMlCWiGKdojcGfVzGiD%2B%2BfIxfA6BKmCYV5aaAuX7fjZ5fP3DFMwJiIdJ1HUCNEirHqLgf4udNCBYEc7ws%2BRINWfKXf5WmVYkH59kD1hPVTIm71Cz2Pf6dcphgNCYM2Hfsb6Ly1oNfvUc6Xcm2Q5TOHJA%2BWa962ja%2FXY0GgncIwutxWKNwBS6WWzhdA5fqVIN%2FaoYM3RfYwOpOuemBsbLPrMDdT02JXVAQUoZgldS2K8xRGiwtvqlSfr9raDf3Xgx%2Bvxa2YaPcQ%3D%3D"}], "quantity_sold_sample": 14, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/261120_innersleeve/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】ブロッコリーカラースリーブ エンボス＆エンボス [2026年11月20日(金)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/261120_colorsleeve_embossemboss/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/08/bsl-04.jpg", "release_date": "46346", "price_jpy": 1320, "store": "", "availability": "", "weight_g": null, "search_term": "Broccoli color sleeves Emboss and Emboss", "ebay_total": 11, "ebay_total_jp": 4, "jp_seller_ratio": 0.3636, "ebay_min_usd": 13.99, "ebay_median_usd": 15.99, "ebay_top_items": [{"title": "Broccoli 80 Character Card Sleeves Protector Emboss & Clear M size BSP-14 Japan", "price_usd": 18.99, "url": "https://www.ebay.com/itm/388526125168?_skw=Broccoli+color+sleeves+Emboss+and+Emboss&hash=item5a75f63070:g:n9AAAeSwb5ZqM-c-"}, {"title": "Broccoli  65 Card Sleeve Protector - Hard Clear - S Size - BSP-22", "price_usd": 13.99, "url": "https://www.ebay.com/itm/389825451289?_skw=Broccoli+color+sleeves+Emboss+and+Emboss&hash=item5ac3685519:g:zkUAAeSw8XNqIUgM"}, {"title": "Broccoli 80 Character Card Sleeves Protector Emboss & Clear M size BSP-14 Japan", "price_usd": 15.99, "url": "https://www.ebay.com/itm/277807341736?_skw=Broccoli+color+sleeves+Emboss+and+Emboss&hash=item40ae9ba0a8:g:ppQAAeSwQ-tpt3K7"}], "quantity_sold_sample": 27, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/261120_colorsleeve_embossemboss/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】ブロッコリーカラースリーブ エンボス＆クリア [2026年11月20日(金)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/261120_colorsleeve_embossclear/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/08/bsl-01.jpg", "release_date": "46346", "price_jpy": 1210, "store": "", "availability": "", "weight_g": null, "search_term": "Broccoli color sleeves Emboss and Clear", "ebay_total": 23, "ebay_total_jp": 11, "jp_seller_ratio": 0.4783, "ebay_min_usd": 13.99, "ebay_median_usd": 16.99, "ebay_top_items": [{"title": "Broccoli 80 Character Card Sleeves Protector Emboss & Clear M size BSP-14 Japan", "price_usd": 18.99, "url": "https://www.ebay.com/itm/388526125168?_skw=Broccoli+color+sleeves+Emboss+and+Clear&hash=item5a75f63070:g:n9AAAeSwb5ZqM-c-"}, {"title": "Broccoli Sleeve Protector Super Thick Embossed & Clear, Size S, 2 Sets", "price_usd": 54.0, "url": "https://www.ebay.com/itm/336764816583?_skw=Broccoli+color+sleeves+Emboss+and+Clear&hash=item4e68bf4cc7:g:a9MAAeSw8rhqkJop&amdata=enc%3AAQALAAABAACCtXRWQnOEpyOqnQQ8KGaG9%2FdlRU7%2F4WYWIqbQedXa7DDthRBbikh1Cn4BTf9kpEJ017eM%2FpLJywx8W1Yb1ttfnYa%2F4h8%2BBEV43waqgdSTXJzwxG1peoCbSOcAS5z3tPJup7TWSIsBGUYjdf4t5qX%2BpBRCkdzxw1zi7zFYiwz%2FIpKTQY1Yx9icO9BgWgYxMtZnD086bfBQASkR74PD19ITrOs36oNP4QS5SP2iHglSurOecs449LSUtEhbnu490NX2a2dFrn3PdemDEKl%2Bo%2FH2NxRyyKxqAogncR3hC2qeTENtOGNHaHSuL8hvgF9igA6jQtzRUbED4qxmf93v6xI%3D"}, {"title": "Broccoli: 68.5mmx93mm M sized Sleeve Protector Clear & Embossed", "price_usd": 25.0, "url": "https://www.ebay.com/itm/168135303228?_skw=Broccoli+color+sleeves+Emboss+and+Clear&hash=item2725a5203c:g:YokAAeSw245pg50v&amdata=enc%3AAQALAAABAACCtXRWQnOEpyOqnQQ8KGYGg0LQD70mq0rB0%2BHXcxe9nvyB4q9z5%2FbBgMlCWiGKdojcGfVzGiD%2B%2BfIxfA6BKmCYV5aaAuX7fjZ5fP3DFMwJiIdJ1HUCNEirHqLgf4udNCBYEc7ws%2BRINWfKXf5WmVYCggH9onSyDUdF0B%2Bqmr4vEsvzTJALWMMDwUpYbYmkfpiaWoo6pfCG5A0FV0JjP9ka8MpDhz4zSozAzZl4PF1DXRW4h%2BHjXa%2BF33ExEskeLrOCyHg8wPHfHy%2BgjPikloiCwVfFM%2BmKuEgX1UrF6WJx2sWrmogQsP6anICzJ%2Bc3zP3d3MziVNJYpN3frEb1t%2Bo%3D"}], "quantity_sold_sample": 21, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/261120_colorsleeve_embossclear/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】ブロッコリーキャラクタースリーブ 喫茶ステラと死神の蝶 [2026年9月19日(土)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/260919_cafestella_charactersleeve/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/06/4510417699361_t.jpg", "release_date": "46284", "price_jpy": 1320, "store": "", "availability": "", "weight_g": null, "search_term": "Broccoli character sleeves Cafe Stella to Shinigami no Chou", "ebay_total": 6, "ebay_total_jp": 3, "jp_seller_ratio": 0.5, "ebay_min_usd": 18.75, "ebay_median_usd": 32.54, "ebay_top_items": [{"title": "Cafe Stella to Shinigami no Chou Natsume Shiki Anime Deck Box Card Case Broccoli", "price_usd": 35.0, "url": "https://www.ebay.com/itm/185887963549?_skw=Broccoli+character+sleeves+Cafe+Stella+to+Shinigami+no+Chou&hash=item2b47c9399d:g:b~MAAOSwjxVkWWnG"}, {"title": "Broccoli Character Sleeve Cafe Stella to Shinigami no Chou Kanna Akizuki Ver.2", "price_usd": 18.75, "url": "https://www.ebay.com/itm/274802355334?_skw=Broccoli+character+sleeves+Cafe+Stella+to+Shinigami+no+Chou&hash=item3ffb7f2c86:g:qu8AAOSwp2NgpDeG"}, {"title": "Cafe Stella to Shinigami no Chou Kanna Akizuki Anime Deck Box Card Case Broccoli", "price_usd": 35.0, "url": "https://www.ebay.com/itm/185887967410?_skw=Broccoli+character+sleeves+Cafe+Stella+to+Shinigami+no+Chou&hash=item2b47c948b2:g:YPwAAOSw6N9kWWq6"}], "quantity_sold_sample": 2, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/260919_cafestella_charactersleeve/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "【新商品】ブロッコリーキャラクタースリーブ RIDDLE JOKER [2026年9月19日(土)発売商品]", "maker": "ブロッコリー", "jan": "", "source": "ブロッコリー公式（トレカお知らせ）", "product_url": "https://www.broccoli.co.jp/tcg/260919_riddle_charactersleeve/", "image_url": "https://www.broccoli.co.jp/_broccoli/wp-content/uploads/2026/06/4510417699347.jpg", "release_date": "46284", "price_jpy": 1320, "store": "", "availability": "", "weight_g": null, "search_term": "Broccoli character sleeves RIDDLE JOKER", "ebay_total": 19, "ebay_total_jp": 19, "jp_seller_ratio": 1, "ebay_min_usd": 23.54, "ebay_median_usd": 33.23, "ebay_top_items": [{"title": "Character Card Sleeve RIDDLE JOKER \"Hazuki Nijoin\" ver. 3 65 pcs  broccoli japan", "price_usd": 44.73, "url": "https://www.ebay.com/itm/387375805969?_skw=Broccoli+character+sleeves+RIDDLE+JOKER&hash=item5a3165b611:g:WWQAAOSwjcFm4ExW"}, {"title": "Broccoli character sleeve RIDDLE JOKER Arihara Nanami #d2ef70", "price_usd": 147.6, "url": "https://www.ebay.com/itm/237037755512?_skw=Broccoli+character+sleeves+RIDDLE+JOKER&hash=item37308d1c78:g:ZFQAAeSwR-1qkyju&amdata=enc%3AAQALAAABAACCtXRWQnOEpyOqnQQ8KGagMOS7cOPhUXd6etbYS6Y%2FJa%2B4GBqdkerBXl2hPWatyDRIb8CEhZ%2FDRodcDv4LbKfzSJVjBMCKwhH1qPPkr1x66JPkKZ9s%2BSM9XZ1IXouAmCDTHSChvknY86%2BHRC9ZopZSp5dzowCXbWsfB%2BR%2BEuYqww%2F3c9xl%2FAqVmPuUoE49RupRixHWfD4mwqtloLl%2BXDrYJEIaUSTSU0h5xpmPgB%2BSR5ii6MWWIPH7KpJy8vVb2HA8Aac5lEmXbv85H%2FZFroZbHv%2B4o%2B6KQSnqGz55nM9bimmW5GL4T0vEdVgq1EqSLKRLieT8t1gYWGs0i7JJsUE%3D"}, {"title": "Character Card Sleeve RIDDLE JOKER \"Ayase Mitsukasa\" ver. 4 65 pcs  broccoli jp", "price_usd": 46.84, "url": "https://www.ebay.com/itm/387375813495?_skw=Broccoli+character+sleeves+RIDDLE+JOKER&hash=item5a3165d377:g:zlYAAOSwDXZm4E2e&amdata=enc%3AAQALAAABAACCtXRWQnOEpyOqnQQ8KGYwL1MQUa4HUg0rLhUzKMPJVJdYE2CkAZ2ZyRIttkyLj67GZs6DlnlRXHpETlA%2F1iEj1cAcI7fa8C5QejT6R3MkyjTaPnGP1zOP6YWUFYMuZGQmdIZT9jUEFDpy%2FNu3IlsiaGZ8UHUxNJ%2FCQkPMtKT72S51rAdy1CTU1dQoNBGVu75E434Dvx8Yn7mNKXeU7pf%2BC858stSjHz2KCcGhLVen8P6kseguNRGeqTVVfbDNoK8gIhvGvGgeWOM05o0f%2F54iPFxwKIx4qtPNBZCk2RSTkBuQ6hDpjJSVBnAcD80q%2BHQwppMfLlBOiLR7Qwt57PY%3D"}], "quantity_sold_sample": 0, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.broccoli.co.jp/tcg/260919_riddle_charactersleeve/", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "ONE PIECEカードゲーム BASE SHOPカードケース vol.1 -ボア・ハンコック-", "maker": "バンダイ", "jan": "", "source": "ONE PIECEカードゲーム公式（サプライ商品一覧）", "product_url": "https://www.onepiece-cardgame.com/products/cardcase005.html", "image_url": "https://www.onepiece-cardgame.com/onepiececg/bccard/jp/products/2026/07/21/K5kNgCbfmEVHI4Ny/img_item01.webp", "release_date": "46269", "price_jpy": 2970, "store": "", "availability": "", "weight_g": null, "search_term": "One Piece BASE SHOP deck case Boa Hancock vol.1", "ebay_total": 1, "ebay_total_jp": 0, "jp_seller_ratio": 0, "ebay_min_usd": 35, "ebay_median_usd": 35, "ebay_top_items": [{"title": "One Piece Card Game Boa Hancock Plastic Deck Box 100 ct Standard Cards", "price_usd": 35.0, "url": "https://www.ebay.com/itm/157850843595?_skw=One+Piece+BASE+SHOP+deck+case+Boa+Hancock+vol.1&hash=item24c0a4b9cb:g:gYoAAeSwGYJp5-Js"}], "quantity_sold_sample": 0, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.onepiece-cardgame.com/products/cardcase005.html", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "ONE PIECEカードゲーム BASE SHOPリミテッドプレイマットvol.2 -五老星-", "maker": "バンダイ", "jan": "", "source": "ONE PIECEカードゲーム公式（サプライ商品一覧）", "product_url": "https://www.onepiece-cardgame.com/products/playmat-baseshop02.html", "image_url": "https://www.onepiece-cardgame.com/onepiececg/bccard/jp/products/2026/05/25/oB7mXVBO588fNeT4/img_item01.webp", "release_date": "46213", "price_jpy": 4730, "store": "", "availability": "", "weight_g": null, "search_term": "One Piece BASE SHOP playmat Gorosei vol.2", "ebay_total": 88, "ebay_total_jp": 88, "jp_seller_ratio": 1, "ebay_min_usd": 59.78, "ebay_median_usd": 124.9, "ebay_top_items": [{"title": "One Piece TCG Base Shop Limited Playmat Vol. 2 Five Elders Gorosei Sealed New", "price_usd": 98.59, "url": "https://www.ebay.com/itm/147538457892?_skw=One+Piece+BASE+SHOP+playmat+Gorosei+vol.2&hash=item2259fa3524:g:pwsAAeSwZERqlLLQ"}, {"title": "ONE PIECE Card Game BASE SHOP Limited Playmat Vol.2 Gorosei 1 Box", "price_usd": 109.0, "url": "https://www.ebay.com/itm/147436376395?_skw=One+Piece+BASE+SHOP+playmat+Gorosei+vol.2&hash=item2253e4914b:g:NxwAAeSwKzZqVoPR"}, {"title": "Bandai One Piece Card Game Playmat Base Shop Limited Vol.2 Gorosei + Promo", "price_usd": 148.62, "url": "https://www.ebay.com/itm/158241829138?_skw=One+Piece+BASE+SHOP+playmat+Gorosei+vol.2&hash=item24d7f2b112:g:hvMAAeSw61RqlRPn"}], "quantity_sold_sample": 1, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.onepiece-cardgame.com/products/playmat-baseshop02.html", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "オフィシャルプレイマット＆カードセット-メラメラの実争奪戦Edition-", "maker": "バンダイ", "jan": "", "source": "ONE PIECEカードゲーム公式（サプライ商品一覧）", "product_url": "https://www.onepiece-cardgame.com/products/playmat_flame-flame-fruit.html", "image_url": "https://www.onepiece-cardgame.com/onepiececg/bccard/jp/product/2026/08/27/b86fF24pKAypvG84/img_item01.webp", "release_date": "46298", "price_jpy": 4730, "store": "", "availability": "", "weight_g": null, "search_term": "One Piece card game playmat Mera Mera no Mi Edition", "ebay_total": 1, "ebay_total_jp": 1, "jp_seller_ratio": 1, "ebay_min_usd": 303, "ebay_median_usd": 303, "ebay_top_items": [{"title": "Pre-order One Piece Playmat The Battle for the Mera Mera Fruit Edition Japanese", "price_usd": 303.0, "url": "https://www.ebay.com/itm/407133972012?_skw=One+Piece+card+game+playmat+Mera+Mera+no+Mi+Edition&hash=item5ecb13662c:g:ktUAAeSw87BqedZ7"}], "quantity_sold_sample": 0, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.onepiece-cardgame.com/products/playmat_flame-flame-fruit.html", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "オフィシャルプレイマット リミテッドエディションvol.6", "maker": "バンダイ", "jan": "", "source": "ONE PIECEカードゲーム公式（サプライ商品一覧）", "product_url": "https://www.onepiece-cardgame.com/products/playmat_limited006.html", "image_url": "https://www.onepiece-cardgame.com/onepiececg/bccard/jp/product/2026/06/18/GfwCzElXwHhi4ZJu/img_item01.webp", "release_date": "", "price_jpy": 4730, "store": "", "availability": "", "weight_g": null, "search_term": "One Piece card game playmat Limited Edition vol.6", "ebay_total": 2864, "ebay_total_jp": 859, "jp_seller_ratio": 0.2999, "ebay_min_usd": 22.99, "ebay_median_usd": 64.97, "ebay_top_items": [{"title": "ONE PIECE Card Game Official Playmat Limited Edition Vol.4 Zoro New no Card", "price_usd": 42.0, "url": "https://www.ebay.com/itm/398106634628?_skw=One+Piece+card+game+playmat+Limited+Edition+vol.6&hash=item5cb1012984:g:JEsAAeSwWS1qPVvt"}, {"title": "One Piece Card Game Official Playmat Limited Edition Vol.5 PROMO Card | English", "price_usd": 648.88, "url": "https://www.ebay.com/itm/327323255572?_skw=One+Piece+card+game+playmat+Limited+Edition+vol.6&hash=item4c35fc8314:g:xyAAAeSwDqFqi34F"}, {"title": "ONE PIECE Card Game Official Playmat Limited Edition Vol. 4 Zoro w/ Promo Leader", "price_usd": 331.91, "url": "https://www.ebay.com/itm/406281626128?_skw=One+Piece+card+game+playmat+Limited+Edition+vol.6&hash=item5e9845a210:g:S9UAAeSwZBJo6pA4"}], "quantity_sold_sample": 64, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.onepiece-cardgame.com/products/playmat_limited006.html", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "オフィシャルカードスリーブ リミテッドエディションvol.6", "maker": "バンダイ", "jan": "", "source": "ONE PIECEカードゲーム公式（サプライ商品一覧）", "product_url": "https://www.onepiece-cardgame.com/products/sleeve040.html", "image_url": "https://www.onepiece-cardgame.com/onepiececg/bccard/jp/product/2026/06/18/9MJE9B439KbFLSGv/img_item01.webp", "release_date": "46214", "price_jpy": 990, "store": "", "availability": "", "weight_g": null, "search_term": "One Piece card game sleeves Limited Edition vol.6", "ebay_total": 1142, "ebay_total_jp": 666, "jp_seller_ratio": 0.5832, "ebay_min_usd": 14.99, "ebay_median_usd": 57.59, "ebay_top_items": [{"title": "ONE PIECE Card Game Official Sleeve Limited Edition Vol.6 Japanese Bandai", "price_usd": 50.0, "url": "https://www.ebay.com/itm/358768912642?_skw=One+Piece+card+game+sleeves+Limited+Edition+vol.6&hash=item53884b2902:g:~GoAAeSwH85qUfoI"}, {"title": "ONE PIECE Card Game Limited Edition Vol. 6 Card Sleeves BANDAI Japan New", "price_usd": 69.91, "url": "https://www.ebay.com/itm/407061430933?_skw=One+Piece+card+game+sleeves+Limited+Edition+vol.6&hash=item5ec6c08295:g:SrEAAeSwhZ9qT9xz"}, {"title": "ONE PIECE Card Game Official Card Sleeves Limited Edition Vol. 6 Set of 4 Japan", "price_usd": 44.99, "url": "https://www.ebay.com/itm/366521831279?_skw=One+Piece+card+game+sleeves+Limited+Edition+vol.6&hash=item5556674f6f:g:iOEAAeSwbvBqSP~e"}], "quantity_sold_sample": 27, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.onepiece-cardgame.com/products/sleeve040.html", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "リミテッドカードスリーブ プレミアムマットvol.6", "maker": "バンダイ", "jan": "", "source": "ONE PIECEカードゲーム公式（サプライ商品一覧）", "product_url": "https://www.onepiece-cardgame.com/products/sleeve041.html", "image_url": "https://www.onepiece-cardgame.com/onepiececg/bccard/jp/products/2026/06/17/3bvtf9OBglsmqaxB/img_item01.webp", "release_date": "", "price_jpy": 1100, "store": "", "availability": "", "weight_g": null, "search_term": "One Piece card game sleeves Premium Mat vol.6", "ebay_total": 46, "ebay_total_jp": 28, "jp_seller_ratio": 0.6087, "ebay_min_usd": 17.61, "ebay_median_usd": 29.99, "ebay_top_items": [{"title": "Sanji 70 Sleeves Japanese One Piece Card Game Official Limited Premium Mat TH21", "price_usd": 18.99, "url": "https://www.ebay.com/itm/177364889978?_skw=One+Piece+card+game+sleeves+Premium+Mat+vol.6&hash=item294bc5717a:g:9-MAAeSw2Jtomm2R"}, {"title": "Nami 70 Sleeves Japanese One Piece Card Game Official Limited Premium Mat ZY2", "price_usd": 19.99, "url": "https://www.ebay.com/itm/177331663194?_skw=One+Piece+card+game+sleeves+Premium+Mat+vol.6&hash=item2949ca715a:g:WLcAAeSw9N9omm0Z"}, {"title": "Nami 70 Sleeves Japanese One Piece Card Game Official Limited Premium Mat", "price_usd": 19.99, "url": "https://www.ebay.com/itm/336495756056?_skw=One+Piece+card+game+sleeves+Premium+Mat+vol.6&hash=item4e58b5c318:g:1-wAAeSw1yRpwOgj"}], "quantity_sold_sample": 216, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.onepiece-cardgame.com/products/sleeve041.html", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "オフィシャルカードスリーブ 16", "maker": "バンダイ", "jan": "", "source": "ONE PIECEカードゲーム公式（サプライ商品一覧）", "product_url": "https://www.onepiece-cardgame.com/products/sleeve042.html", "image_url": "https://www.onepiece-cardgame.com/onepiececg/bccard/jp/product/2026/08/05/Qolp4ZBbxeWOLaVy/img_item01.webp", "release_date": "46256", "price_jpy": 990, "store": "", "availability": "", "weight_g": null, "search_term": "One Piece card game official sleeves 16", "ebay_total": 89, "ebay_total_jp": 78, "jp_seller_ratio": 0.8764, "ebay_min_usd": 13.41, "ebay_median_usd": 26.12, "ebay_top_items": [{"title": "ONE PIECE Card Game Official Card Sleeve 16 BANDAI 70 Sleeves Japan New", "price_usd": 51.91, "url": "https://www.ebay.com/itm/407163133923?_skw=One+Piece+card+game+official+sleeves+16&hash=item5eccd05fe3:g:cToAAeSwiTNqiddo"}, {"title": "ONE PIECE Card Game Official Sleeve Vol.16 Japanese Bandai", "price_usd": 50.0, "url": "https://www.ebay.com/itm/820042053571?_skw=One+Piece+card+game+official+sleeves+16&hash=itembeee50b7c3:g:e9IAAeSww-FqjF-~&amdata=enc%3AAQALAAABAACCtXRWQnOEpyOqnQQ8KGZzgNF%2FI%2BfIUY2r%2FeoyXRZn3zhZFek94Vr%2F7sS17HtdnaOG5Xnd%2FeDHbrZD%2BwN85pCme72gYQAWPAQQCifceQujsrqD09vN9FVKOJ1nzQAPLS29bPmwSqvUnLl8kRaj3ISObp9Qnb%2BYEKkbI0cR4JNdaY41DSDjHHnOWwfIm1RTRabm%2BnD6pul9IozF1OmodiHF3s9k1rP91LspbqxdP03SGNToRzn5G5o3REotbpBTt7oYotwRfC%2F0ohX0C10ntw29ovjvX9LSRBGfLW3KZQo%2Bbc3A3fSgZSXiU71D57CtBtb7RR%2BtNHpYflQJgSwqeFM%3D"}, {"title": "Mokey D Luffy 70 Sleeves  One Piece Card Game  Official Ver.16  TCG Japanese/A2", "price_usd": 20.5, "url": "https://www.ebay.com/itm/366622290932?_skw=One+Piece+card+game+official+sleeves+16&hash=item555c6433f4:g:ZKsAAeSw-qlql7NO&amdata=enc%3AAQALAAABAACCtXRWQnOEpyOqnQQ8KGaZ1JdqcMadR6oEleyQyOO8Kmhmd%2BYJ5F%2BfpD3d%2FeRx7H94wMxZthDscBc0JdAi1o5XZ2NJH68wKq56qYqowdf8XX%2FjKrchVDLwqngzF%2B3kP75AlMwpTu5dQD2aEXxOWH5vSGXgTwUoyrQl0QGg8CV0btsd%2FqWPZjMRnqSL72Z93FfoZLzGkUaKzNUIEbegYXBJYc6q18RduCTm9uF7pOFEdiUlxn%2BFNKyU3t0NNPXGTA3miZFzqbY1CVLRx7x9Fe%2FhzbzmlyLrtCDv3J%2BE4ontTs%2BtkTIw8awSt7svJmg3DwuVQh0gmh49gkOyToZX8AI%3D"}], "quantity_sold_sample": 20, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.onepiece-cardgame.com/products/sleeve042.html", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "リミテッドカードスリーブ-メラメラの実争奪戦Edition-", "maker": "バンダイ", "jan": "", "source": "ONE PIECEカードゲーム公式（サプライ商品一覧）", "product_url": "https://www.onepiece-cardgame.com/products/sleeve043.html", "image_url": "https://www.onepiece-cardgame.com/onepiececg/bccard/jp/product/2026/08/27/k9HYX748UEW8tHLR/img.webp", "release_date": "46298", "price_jpy": 990, "store": "", "availability": "", "weight_g": null, "search_term": "One Piece card game sleeves Mera Mera no Mi Edition", "ebay_total": 1, "ebay_total_jp": 0, "jp_seller_ratio": 0, "ebay_min_usd": 41.39, "ebay_median_usd": 41.39, "ebay_top_items": [{"title": "One Piece Card Game Official Sleeves: Assortment 8 - Sailor Nami 70-Pack", "price_usd": 41.39, "url": "https://www.ebay.com/itm/377441555482?_skw=One+Piece+card+game+sleeves+Mera+Mera+no+Mi+Edition&hash=item57e145141a:g:Xu0AAeSwJmhqioWh"}], "quantity_sold_sample": 0, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.onepiece-cardgame.com/products/sleeve043.html", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "リミテッドカードスリーブ スタンダードオレンジシルバー", "maker": "バンダイ", "jan": "", "source": "ONE PIECEカードゲーム公式（サプライ商品一覧）", "product_url": "https://www.onepiece-cardgame.com/products/sleeve044.html", "image_url": "https://www.onepiece-cardgame.com/onepiececg/bccard/jp/product/2026/08/27/6g4vV6nlCW0rYzSO/img.webp", "release_date": "46298", "price_jpy": 990, "store": "", "availability": "", "weight_g": null, "search_term": "One Piece card game sleeves Standard Orange Silver", "ebay_total": 1519, "ebay_total_jp": 716, "jp_seller_ratio": 0.4714, "ebay_min_usd": 12.99, "ebay_median_usd": 24.99, "ebay_top_items": [{"title": "ONE PIECE Card Game Official Card Sleeve 16 BANDAI 70 Sleeves Japan New", "price_usd": 19.91, "url": "https://www.ebay.com/itm/407163133923?_skw=One+Piece+card+game+sleeves+Standard+Orange+Silver&var=677337106933&hash=item5eccd05fe3:g:J-IAAeSw5rdqideS"}, {"title": "ONE PIECE Card Game Official Sleeve Vol.16 Japanese Bandai", "price_usd": 50.0, "url": "https://www.ebay.com/itm/820042053571?_skw=One+Piece+card+game+sleeves+Standard+Orange+Silver&var=626896059525&hash=itembeee50b7c3:g:LdsAAeSwvW9qjGAO&amdata=enc%3AAQALAAABEACCtXRWQnOEpyOqnQQ8KGZzgNF%2FI%2BfIUY2r%2FeoyXRZn3zhZFek94Vr%2F7sS17HtdnaOG5Xnd%2FeDHbrZD%2BwN85pCme72gYQAWPAQQCifceQujsrqD09vN9FVKOJ1nzQAPLS29bPmwSqvUnLl8kRaj3ISqOINcEcXT20j%2F239qatx5nWSViNJSgizcC49svQMCTwQ3hIJPKMd4%2F3QUFOB9EaS8SCLQtHTr5JD1mM6BXahdhbgS7NQMsD9yK79c0zp68mA%2FTyGGWnXkC6QkiwlB0FNZit1t76BF8o4sJOU3WZV8Dnq2ySDbJ2O2aDiLOmQj5BtKghX7SrIhYSrjpoSb5AUdiewOdjfuHHjjBCNmN2v9"}, {"title": "ONE PIECE Card Game Official Sleeve Limited Edition Vol.6 Japanese Bandai", "price_usd": 50.0, "url": "https://www.ebay.com/itm/358768912642?_skw=One+Piece+card+game+sleeves+Standard+Orange+Silver&var=626805240864&hash=item53884b2902:g:nU8AAeSw6QhqUfoO"}], "quantity_sold_sample": 15, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.onepiece-cardgame.com/products/sleeve044.html", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "オフィシャルストレージボックス-メラメラの実争奪戦Edition-", "maker": "バンダイ", "jan": "", "source": "ONE PIECEカードゲーム公式（サプライ商品一覧）", "product_url": "https://www.onepiece-cardgame.com/products/storage008.html", "image_url": "https://www.onepiece-cardgame.com/onepiececg/bccard/jp/product/2026/08/27/iOhACe3VmYVOAy1q/img.webp", "release_date": "46298", "price_jpy": 990, "store": "", "availability": "", "weight_g": null, "search_term": "One Piece storage box Mera Mera no Mi Edition", "ebay_total": 0, "ebay_total_jp": 0, "jp_seller_ratio": null, "ebay_min_usd": null, "ebay_median_usd": null, "ebay_top_items": [], "quantity_sold_sample": null, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "", "key": "https://www.onepiece-cardgame.com/products/storage008.html", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "Japanese card sleeves", "maker": "", "jan": "", "source": "手入力", "product_url": "", "image_url": "", "release_date": "", "price_jpy": null, "store": "", "availability": "未確認", "weight_g": null, "search_term": "japanese card sleeves", "ebay_total": 46575, "ebay_total_jp": 29259, "jp_seller_ratio": 0.6282, "ebay_min_usd": 2.49, "ebay_median_usd": 10.74, "ebay_top_items": [{"title": "Random Dragon Shield 60 Sleeves Pack x3 Japanese Size🐉for YuGiOh Random Model", "price_usd": 20.0, "url": "https://www.ebay.com/itm/206284898916?_skw=japanese+card+sleeves&hash=item300789c264:g:~6oAAeSwxahqBM6i"}, {"title": "japanese card sleeves", "price_usd": 160.0, "url": "https://www.ebay.com/itm/398349859814?_skw=japanese+card+sleeves&hash=item5cbf807be6:g:HQUAAeSw2DJql67v&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGZH90pBqh4RdRxp8LStY%2FNXWbG9KpeLkta2HeuuXdzEnNmW4Bk%2FrkEtFofqE78B6i04h1WdbDcIFqCZZmOQLxI0cDhVlHmcDD9Trx3NCHmhSS2RQVmxnOFElUDJ37isj6mCzzbM9N%2FvZRolB1MlLcLCs8c2yNpsa1rQncNjS1aQqeZjm2yFjVVN8x2YO4jnfk0AohzrR8HQi1z84VhIW%2BpqSRZMa8KDfdmm%2BqE1anMDsdR8vN%2B9ZkxTSvRd%2B9W6ByOyg4j%2BwhngoW6zc%2BQNJcWGth8Wz6vCMc5AzQKrC0z%2BPA%3D%3D"}, {"title": "Custom Card Sleeves:  Mtg/Commander/Lorcana/Yugioh/Digimon/Pokemon", "price_usd": 45.0, "url": "https://www.ebay.com/itm/358863051322?_skw=japanese+card+sleeves&hash=item538de79a3a:g:jIAAAOSwG5RmjXHb&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGYvSxy1xoQTJqmkeF9g2TxzrPN82%2FWMS%2Bb%2B%2F2rBm0okgAsT5iNO%2FSKz0MW8HZbMYIREgqg1JhOFr8fUeU4Hw6pXP7QMI9%2FQXeGqFPvZDMuMI0uO%2FvnWZ4qxPf3SyplToKVbha%2Bvg%2BpVzR13lKSUYzLAhg5uMBVkEIXzKNdXptG4VbaHHDcIDp1P%2BuNp0HxOUFLivtOtSdLiwwkthTlYPWKo1Mp%2F0oCnvbC7NXqqxj1ynw0OWBX%2Bpqe2KQ0TYX1QQMsiw7VVlV0%2FPORZwNqCBJuRJowZCnnmbclh9GryeMUcQw%3D%3D"}], "quantity_sold_sample": 60, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "サンプル・要差し替え", "key": "manual:Japanese card sleeves", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "Deck case Japan", "maker": "", "jan": "", "source": "手入力", "product_url": "", "image_url": "", "release_date": "", "price_jpy": null, "store": "", "availability": "未確認", "weight_g": null, "search_term": "deck case japan", "ebay_total": 5260, "ebay_total_jp": 3927, "jp_seller_ratio": 0.7466, "ebay_min_usd": 7.99, "ebay_median_usd": 34.99, "ebay_top_items": [{"title": "Yu-Gi-Oh ZEXAL Emperor's Key Storage Box DX Deck Case Japan Sealed NEW", "price_usd": 64.99, "url": "https://www.ebay.com/itm/178453309447?_skw=deck+case+japan&hash=item298ca56807:g:uB0AAeSwcZxqlFPK"}, {"title": "Pokemon Official Deck Shield & Deck Case Japan Championship 2026 PJCS Japanese", "price_usd": 68.3, "url": "https://www.ebay.com/itm/287384018132?_skw=deck+case+japan&hash=item42e96c1cd4:g:LgUAAeSw2ihqKAUO&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGaqa8KTl1%2BrvLi7nOjEkgBXjnUL1ErvXk0w4l2zwmHOsDHjHxlZX0guy9eWe8s4Jt7VbFGDsjegVksvyK1NO7PNkBfBTT4V072Lff2D2ITVEbyCMakTTYZGpKzqWHg1TfA7jvtog%2BfQtMBUfOG%2F7nSpAskRChSqsebmYsKDIwfeau6j7%2FphOKbIPb%2Bck9owp3JacwMIsTnyTSIOIsCpJwWFP30ff0sSnRCbW0YpqwrQbmSVoSeSoxPPvSf8QNWoC12spP7OFxyEq4nlEqc6OaskvlDuQ2lXsXFa62FrtNbJxw%3D%3D"}, {"title": "Pokémon Japan PJCS 2026 Set: Playmat - Deck Shield/Sleeves - Deck Case NEW!", "price_usd": 70.0, "url": "https://www.ebay.com/itm/198566584942?_skw=deck+case+japan&hash=item2e3b7da26e:g:ZSAAAeSwWQxqfOEx&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGZ2P0OVQVw3tWsvHa2bu0LOwbtciSuAlbYXi4K9G1pL1%2FTdIgyzdn9h5iCIqLYO00DNn5c--rmT%2BqTvi32I7z7r6S38s1EDkf06eMTOHKp212oJ%2Bd%2BK%2Frt1o19C%2B%2BqV1k6nH2JnJpz1x1UAt7xNl%2FeSPIuiCfd8mykqdU7wtsJZelqrckXU4kpF1A2Un%2B1hf6E8ypsY6wbQ0YTicf45IceBauaSTAan7ob26W1KOk2Fwu8G5WqCEjDiuoACtqGc%2FOK1UIR5IoMn3AwKSSiai5CQ0DbzJ%2F2gJHIC%2B09fWBcPfA%3D%3D"}], "quantity_sold_sample": 0, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "サンプル・要差し替え", "key": "manual:Deck case Japan", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "Card loader Japan", "maker": "", "jan": "", "source": "手入力", "product_url": "", "image_url": "", "release_date": "", "price_jpy": null, "store": "", "availability": "未確認", "weight_g": null, "search_term": "card loader japan", "ebay_total": 1314, "ebay_total_jp": 430, "jp_seller_ratio": 0.3272, "ebay_min_usd": 3, "ebay_median_usd": 39.65, "ebay_top_items": [{"title": "New Hobby Base Card Accessory Collection TCG Loader X Clear CAC-SL249 from Japan", "price_usd": 15.91, "url": "https://www.ebay.com/itm/198499136970?_skw=card+loader+japan&hash=item2e377875ca:g:WJ4AAeSw0-xqV1ov"}, {"title": "Daiso Magnetic Card Loader 35pt UV Cut 95% One-Touch Holder x5 Japan Seller", "price_usd": 14.99, "url": "https://www.ebay.com/itm/307129566522?_skw=card+loader+japan&hash=item478259453a:g:xvkAAeSw19lqgagi&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGY3JpoI3AS7chFM5YnqRX2fb2naNIYxnnw7rW7ZDAw2TU%2BzGhFdCEyftmzY6Lhs10WU%2BMLBOiz5NRoQvMe2GPZn1HmxsYOxkhZPEDgd7pItO3fHFa5FdL4LhrG%2FYXioaT9nO2GcUnK9GVk8JeV1z2QNNE9BAt3roQh1wOEdDYrDhi%2Fdo56TJ%2Fhj18nslq0PKxXj4%2BVkxm%2F08psHFBh2IidRqwUKgX8nL9jmBJyC1OcjJ28C1MsLxd4ECrVvBQZxqX7OYbxC15C4Vu0SJ3%2B1FkmTU%2FzsHm%2FnIjos0iwrHjlNeg%3D%3D"}, {"title": "Trading Card Box Protective Case Semi-Hard Loader 10 Pack Pokemon Yu-Gi-Oh Japan", "price_usd": 36.8, "url": "https://www.ebay.com/itm/227499025247?_skw=card+loader+japan&hash=item34f7ffa35f:g:CCsAAeSwGEZqlUTQ&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGaJiJ8Aay%2BI%2BrOm7FYavmE9lmjxQbhUKbflmTWqOfnx925Qrqob%2FSC1ISgljMl7%2BRR5LnFo0cNcOKG3LObxM9NAWk41Bi2eIEDhYEp3PwZYg5Yjk8w7i7aLm7dC841PM1cohcL%2BP0iGyV1hHVj033Qi79Th1u0ti67Fu5KFfwv0AlcubHFNd7w63hQy%2FHVhHUKnhc4Yb%2BwiN%2F9COGzGSONJwYEM5cvof0vwwrxmswZOPkiKRCBY8OdF7PXMhdzYDSnaS2mPrJlF%2FoRzqPT%2BMi7EU036eyVng48lzl2ykpUQNw%3D%3D"}], "quantity_sold_sample": null, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "サンプル・要差し替え", "key": "manual:Card loader Japan", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "Pokemon Center sleeves", "maker": "", "jan": "", "source": "手入力", "product_url": "", "image_url": "", "release_date": "", "price_jpy": null, "store": "", "availability": "未確認", "weight_g": null, "search_term": "pokemon center sleeves", "ebay_total": 6792, "ebay_total_jp": 2552, "jp_seller_ratio": 0.3757, "ebay_min_usd": 0.99, "ebay_median_usd": 19.88, "ebay_top_items": [{"title": "Individual Pokemon Center Japan Card Sleeves: Free Combined Shipping! -BULK SALE", "price_usd": 0.99, "url": "https://www.ebay.com/itm/186609215624?_skw=pokemon+center+sleeves&hash=item2b72c6a888:g:diwAAOSwytdnr2no"}, {"title": "Pokemon TCG ETB Sleeves - CHOOSE YOUR CARD DECK SLEEVES (65 Pack)Bundle Shipping", "price_usd": 19.99, "url": "https://www.ebay.com/itm/396903398377?_skw=pokemon+center+sleeves&hash=item5c69493be9:g:NwMAAeSwFU5qd2wa"}, {"title": "Pokémon TCG 45 Individual Card Sleeves. Pokemon Center/Pokemon Center Japan Lot", "price_usd": 25.0, "url": "https://www.ebay.com/itm/298539475466?_skw=pokemon+center+sleeves&hash=item458256e20a:g:iwIAAeSwPpdqaK6I"}], "quantity_sold_sample": null, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "サンプル・要差し替え", "key": "manual:Pokemon Center sleeves", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "KMC sleeves", "maker": "", "jan": "", "source": "手入力", "product_url": "", "image_url": "", "release_date": "", "price_jpy": null, "store": "", "availability": "未確認", "weight_g": null, "search_term": "kmc sleeves", "ebay_total": 830, "ebay_total_jp": 240, "jp_seller_ratio": 0.2892, "ebay_min_usd": 6.95, "ebay_median_usd": 16.38, "ebay_top_items": [{"title": "10x KMC Perfect Fit / Size Sleeves - 1000 Count - MTG Magic Gathering Pokemon", "price_usd": 52.0, "url": "https://www.ebay.com/itm/286839491211?_skw=kmc+sleeves&hash=item42c8f74a8b:g:GLQAAeSw1JRo1Qk5"}, {"title": "KMC Hyper Mat Pro Black Sleeves - 100 Count - MTG Magic Gathering Pokemon", "price_usd": 17.75, "url": "https://www.ebay.com/itm/287001139477?_skw=kmc+sleeves&hash=item42d299d915:g:RA0AAeSwDXRpOS-b&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGZOemoNMvtidWukgEIbXNf%2FPtHixWxnZ3gRqWxVLf8aCAcHwEXf02FoYdrnn8YicN41aDffOaXBem2OvuPkBJ8YUfGbSM3po01VTKTf%2Fl5nhU8oa8gx7aoWUm4TjvYWE%2FiY3F9WRthHJkzD2R0se%2Bb6Gpqo12MctNvNT0Bou0IL4BcpTUyQhhVF7Nb2nCFP2Tc50VAIH%2FIgcGnae4CINZDslPYmGx2yAHEc%2BM4MT1J1I34RgwTfPOat%2FswPOUNCYN%2F9ZWNG02%2Bl2%2FOaKAq3D78WJ%2FMKMbETmusLqV3H8n9a%2BA%3D%3D"}, {"title": "5x KMC Perfect Fit / Size Sleeves - 500 Count - MTG Magic the Gathering Pokemon", "price_usd": 29.5, "url": "https://www.ebay.com/itm/286839488105?_skw=kmc+sleeves&hash=item42c8f73e69:g:7HwAAeSwqBpo1Qgh&amdata=enc%3AAQALAAAA4ACCtXRWQnOEpyOqnQQ8KGYXC0%2BrkOl0jF0wI4%2BpvE0CrknJyTiIGlyHaydd2B2ApcuG398zN3vNnvTll8Qmo2XRnT0zpNvcWlIecyxwsPoW%2FCd4F1bi%2FeqqaU7kDd%2B%2BgmGERpmYayMIWnbb8HwXQzGzHJPfA0xh8nbwsNXtqiaJ7NzkZZo1l42jQkXkn%2BLughoWtIig8dlx%2F%2BxW7moI9uJb8sjrlIkJSCOIsr7QdM5Web38EeidUUHSWlbfSTxUrbcUm%2Bv6imshFXeJmNuDIw77m2iKNbSL9a4birKC6Fqd"}], "quantity_sold_sample": null, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "サンプル・要差し替え", "key": "manual:KMC sleeves", "change_pct": null}, {"category": "A", "category_label": "トレカサプライ", "name": "Broccoli sleeves", "maker": "", "jan": "", "source": "手入力", "product_url": "", "image_url": "", "release_date": "", "price_jpy": null, "store": "", "availability": "未確認", "weight_g": null, "search_term": "broccoli sleeves", "ebay_total": 2635, "ebay_total_jp": 1827, "jp_seller_ratio": 0.6934, "ebay_min_usd": 9.49, "ebay_median_usd": 18.49, "ebay_top_items": [{"title": "Broccoli 80 Sleeves Protector BSP-14 Emboss & Clear M size Standard Oversleeves", "price_usd": 11.99, "url": "https://www.ebay.com/itm/227468111539?_skw=broccoli+sleeves&hash=item34f627eeb3:g:~XcAAeSwqylqeB7n"}, {"title": "Broccoli Sleeve Protector BSP-14 M Emboss & Clear TCG Card 80 sleeves set of 10", "price_usd": 121.0, "url": "https://www.ebay.com/itm/358189540699?_skw=broccoli+sleeves&hash=item5365c2a55b:g:GWcAAeSwLCdpgING&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGYrPTgZHu15HDE%2B6hOs8vVXsI7bGH2iz0I3q7w0stkVJu1RMlaRgy%2FX4iqYu9or5x7FBEJrB2ncuslGepmQVl1sJz6T%2BB1CehQeanroyvD%2F4W7BDxfzH3OlFaqib69aCMlSOgmlaX%2F8gziXEyMjsXyt4gSWMcsVGi3xqCxxu1KGBxJoARDLDzI7DnGJozhM3UEU1OpMiZE%2FMc3AxIG9S1wCNaDSpCnhpSIg2UmbLxSAWWk%2BTms9ba4tgaYmcGalEMey5WwlBa4Hwc6XX37LcWX7DSiw0NGFJxc0n4cDIn6hYw%3D%3D"}, {"title": "Broccoli Sleeves Protector BSP-13 Emboss&Clear S sized 65x91.5mm 80Pcs set of 10", "price_usd": 108.0, "url": "https://www.ebay.com/itm/178177449891?_skw=broccoli+sleeves&hash=item297c341fa3:g:FCgAAeSwEvtqGOPM&amdata=enc%3AAQALAAAA8ACCtXRWQnOEpyOqnQQ8KGbdHDPskJSHVcOu%2BvlOpdraD6Usiz%2BPh7lFIlppzbCd3KbqpCNgLsi1NT%2F6VQtMMbGO--%2BwSlHXOYcgHjDiDEOr%2BvdQ6ar5N87D6QmQKSkGabvQPbietjhGuGg2qtuBsp31JLA%2BC88OcXkvny0CSkNmfmaWeMEXBybI6HAFrbhGIRf3vBZLCO6XBckmxdgWIMHMnPUvqaFnBC4NMDKTlL%2FSumF4zEZZIdKwJd55%2FkLDUL%2BROzl9CSpZUtQQ%2FiudE%2B9eQw16BeWh39K5nYTshoygVtpMLSfMvt67WQuy0b0SxQ%3D%3D"}], "quantity_sold_sample": null, "judgment": "", "first_detected": "46268", "last_updated": "46268", "note": "サンプル・要差し替え", "key": "manual:Broccoli sleeves", "change_pct": null}];
 const SHOW_PRIVATE = false;
+const TODAY_ISO = "2026-09-03";
 
-const COLUMNS = [
-  {key:"category_label", label:"系統", type:"str"},
-  {key:"name", label:"商品名", type:"str", cls:"name"},
-  {key:"maker", label:"メーカー", type:"str"},
-  {key:"jan", label:"JAN", type:"str"},
-  {key:"store", label:"仕入店舗", type:"str"},
-  {key:"availability", label:"補充性", type:"str"},
-  {key:"weight_g", label:"重量(g)", type:"num"},
-  {key:"ebay_total", label:"eBay出品数(全体)", type:"num"},
-  {key:"ebay_total_jp", label:"eBay出品数(JP概算)", type:"num"},
-  {key:"jp_seller_ratio", label:"JPセラー比率", type:"pct"},
-  {key:"ebay_min_usd", label:"eBay最安USD", type:"usd"},
-  {key:"ebay_median_usd", label:"eBay中央値USD", type:"usd"},
-  {key:"quantity_sold_sample", label:"売れ数サンプル", type:"num"},
-];
-if(SHOW_PRIVATE){
-  COLUMNS.push({key:"store_price", label:"店頭価格(円)", type:"jpy"});
-  COLUMNS.push({key:"gross_margin_jpy", label:"粗利見込み(円)", type:"jpy"});
-}
-COLUMNS.push({key:"judgment", label:"判定", type:"judge"});
-COLUMNS.push({key:"first_detected", label:"初回検出日", type:"str"});
-COLUMNS.push({key:"last_updated", label:"最終更新日", type:"str"});
-COLUMNS.push({key:"__links__", label:"リンク", type:"links", nosort:true});
-
-let sortKey = "ebay_total";
-let sortDir = -1; // 降順スタート
-let activeCat = "";
-let judgeFilter = "";
-let keyword = "";
+let sortKey = "first_detected", sortDir = -1;
+let activeCat = "", judgeFilter = "", sourceFilter = "", keyword = "";
 
 function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function fmtNum(v){ return (v===null||v===undefined||v==="") ? "?" : Number(v).toLocaleString(); }
+function fmtUsd(v){ return (v===null||v===undefined||v==="") ? "?" : "$" + Number(v).toFixed(2); }
+function fmtJpy(v){ return (v===null||v===undefined||v==="") ? "?" : "\u00a5" + Math.round(Number(v)).toLocaleString(); }
+function fmtPct(v){ return (v===null||v===undefined||v==="") ? "?" : (Number(v)*100).toFixed(1) + "%"; }
 
-function extractEbayQuery(title){
-  const tokens = (title || "").match(/[A-Za-z0-9!'&.-]+/g) || [];
+function extractEbayQuery(item){
+  if(item.search_term) return item.search_term;
+  const tokens = (item.name || "").match(/[A-Za-z0-9!'&.-]+/g) || [];
   const filtered = tokens.filter(t => t.length >= 2);
-  if(filtered.length > 0) return filtered.join(" ");
-  return (title || "").slice(0, 40);
+  return filtered.length ? filtered.join(" ") : (item.name || "").slice(0, 40);
 }
 function ebaySearchUrl(item){
-  const eq = encodeURIComponent(item.search_term ? item.search_term : extractEbayQuery(item.name));
-  return `https://www.ebay.com/sch/i.html?_nkw=${eq}&LH_ItemCondition=1000`;
+  return `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(extractEbayQuery(item))}&LH_ItemCondition=1000`;
 }
 function terapeakUrl(item){
-  const eq = encodeURIComponent(item.search_term ? item.search_term : extractEbayQuery(item.name));
-  return `https://www.ebay.com/sh/research?keywords=${eq}&marketplace=EBAY-US&tabName=SOLD`;
+  return `https://www.ebay.com/sh/research?keywords=${encodeURIComponent(extractEbayQuery(item))}&marketplace=EBAY-US&tabName=SOLD`;
 }
 
-function fmtNum(v){ return (v===null||v===undefined||v==="") ? "" : Number(v).toLocaleString(); }
-function fmtUsd(v){ return (v===null||v===undefined||v==="") ? "" : "$" + Number(v).toFixed(2); }
-function fmtJpy(v){ return (v===null||v===undefined||v==="") ? "" : "¥" + Math.round(Number(v)).toLocaleString(); }
-function fmtPct(v){ return (v===null||v===undefined||v==="") ? "" : (Number(v)*100).toFixed(1) + "%"; }
+function isNewItem(it){ return it.first_detected && it.first_detected === TODAY_ISO; }
 
-function cellHtml(item, col){
-  const v = item[col.key];
-  if(col.key === "__links__"){
-    return `<span class="srch"><a href="${ebaySearchUrl(item)}" target="_blank" rel="noopener">eBay検索</a><a href="${terapeakUrl(item)}" target="_blank" rel="noopener">Terapeak</a></span>`;
-  }
-  if(col.key === "category_label"){
-    return `<span class="chip cat">${esc(item.category || "")} ${esc(v||"")}</span>`;
-  }
-  if(col.type === "num") return `<span class="num">${fmtNum(v)}</span>`;
-  if(col.type === "usd") return `<span class="num">${fmtUsd(v)}</span>`;
-  if(col.type === "jpy") return `<span class="num">${fmtJpy(v)}</span>`;
-  if(col.type === "pct") return `<span class="num">${fmtPct(v)}</span>`;
-  if(col.type === "judge"){
-    if(!v) return "";
-    const cls = v === "出品" ? "judge-list" : (v === "見送り" ? "judge-pass" : "judge-buy");
-    return `<span class="chip ${cls}">${esc(v)}</span>`;
-  }
-  return esc(v);
+function judgeChip(v){
+  if(!v) return "";
+  const cls = v === "出品" ? "judge-list" : (v === "見送り" ? "judge-pass" : "judge-buy");
+  return `<span class="chip ${cls}">${esc(v)}</span>`;
 }
-
-function rowClass(item){
-  if(item.change_pct === null || item.change_pct === undefined) return "";
-  if(item.change_pct >= 0.30) return "up";
-  if(item.change_pct <= -0.30) return "down";
+function changeChip(it){
+  if(it.change_pct === null || it.change_pct === undefined) return "";
+  if(it.change_pct >= 0.30) return `<span class="chip pct-up">\u25b2${(it.change_pct*100).toFixed(0)}%</span>`;
+  if(it.change_pct <= -0.30) return `<span class="chip pct-down">\u25bc${(it.change_pct*100).toFixed(0)}%</span>`;
+  return "";
+}
+function cardClass(it){
+  if(it.change_pct === null || it.change_pct === undefined) return "";
+  if(it.change_pct >= 0.30) return "up";
+  if(it.change_pct <= -0.30) return "down";
   return "";
 }
 
-function changeBadge(item){
-  if(item.change_pct === null || item.change_pct === undefined) return "";
-  if(item.change_pct >= 0.30) return `<span class="chip pct-up">▲${(item.change_pct*100).toFixed(0)}%</span>`;
-  if(item.change_pct <= -0.30) return `<span class="chip pct-down">▼${(item.change_pct*100).toFixed(0)}%</span>`;
-  return "";
+function topItemsHtml(it){
+  const tops = it.ebay_top_items || [];
+  if(!tops.length) return "";
+  return `<div class="toplist">` + tops.map((t,i) => {
+    const price = (t.price_usd===null||t.price_usd===undefined) ? "" : `<span class="p">$${Number(t.price_usd).toFixed(2)}</span>`;
+    const title = esc((t.title||"").length > 46 ? t.title.slice(0,46)+"\u2026" : (t.title||""));
+    return t.url ? `<a href="${esc(t.url)}" target="_blank" rel="noopener">${i+1}. ${title}</a>${price}` : `<span>${i+1}. ${title}</span>${price}`;
+  }).join("") + `</div>`;
 }
 
-function renderHead(){
-  const tr = document.getElementById("theadRow");
-  tr.innerHTML = COLUMNS.map(col => {
-    const arrow = (col.key === sortKey) ? `<span class="arrow">${sortDir === 1 ? "▲" : "▼"}</span>` : "";
-    return `<th data-key="${col.key}" data-sortable="${col.nosort ? "0" : "1"}">${esc(col.label)}${arrow}</th>`;
-  }).join("");
-  tr.querySelectorAll("th").forEach(th => {
-    if(th.dataset.sortable === "0") return;
-    th.addEventListener("click", () => {
-      const key = th.dataset.key;
-      if(sortKey === key){ sortDir = -sortDir; } else { sortKey = key; sortDir = 1; }
-      render();
-    });
-  });
+function cardHtml(it){
+  const img = it.image_url
+    ? `<img src="${esc(it.image_url)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`
+    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px">no image</div>`;
+  const badges = [
+    isNewItem(it) ? `<span class="chip new">本日新規</span>` : "",
+    `<span class="chip cat">${esc(it.category||"")}</span>`,
+  ].filter(Boolean).join("");
+  const privateRow = SHOW_PRIVATE
+    ? `<div class="private">店頭価格 ${fmtJpy(it.store_price)}｜粗利見込み ${fmtJpy(it.gross_margin_jpy)}</div>`
+    : "";
+  return `
+    <div class="card ${cardClass(it)}" data-key="${esc(it.key)}">
+      <div class="imgbox">
+        <a href="${esc(it.product_url)}" target="_blank" rel="noopener">${img}</a>
+        <div class="bdg">${badges}</div>
+      </div>
+      <div class="body">
+        <div class="t"><a href="${esc(it.product_url)}" target="_blank" rel="noopener">${esc(it.name)}</a></div>
+        <div class="mk">${esc(it.maker || "メーカー不明")}｜${esc(it.source || "")}${it.jan ? "｜JAN:"+esc(it.jan) : ""}</div>
+        <div class="foot"><span class="dt num">${esc(it.release_date || "発売日未定")}</span><span class="pr num">${it.price_jpy!=null ? fmtJpy(it.price_jpy) : ""}</span></div>
+        <div class="ebayrow">
+          出品数(全体/JP) <b class="num">${fmtNum(it.ebay_total)}</b>/<b class="num">${fmtNum(it.ebay_total_jp)}</b> ${changeChip(it)}
+          ｜JPセラー比率 <b class="num">${fmtPct(it.jp_seller_ratio)}</b><br>
+          最安/中央値 <b class="num">${fmtUsd(it.ebay_min_usd)}</b>/<b class="num">${fmtUsd(it.ebay_median_usd)}</b>
+          ｜売れ数サンプル <b class="num">${fmtNum(it.quantity_sold_sample)}</b>
+        </div>
+        ${topItemsHtml(it)}
+        <div class="srch"><a href="${ebaySearchUrl(it)}" target="_blank" rel="noopener">eBay検索</a><a href="${terapeakUrl(it)}" target="_blank" rel="noopener">Terapeak</a></div>
+        ${privateRow}
+        ${judgeChip(it.judgment)}
+        ${it.note ? `<div class="note">${esc(it.note)}</div>` : ""}
+      </div>
+    </div>`;
 }
 
 function currentData(){
   return DATA.filter(item => {
     if(activeCat && item.category !== activeCat) return false;
+    if(sourceFilter && item.source !== sourceFilter) return false;
     if(judgeFilter){
       if(judgeFilter === "__blank__"){ if(item.judgment) return false; }
       else if(item.judgment !== judgeFilter) return false;
     }
     if(keyword){
-      const hay = [item.name, item.maker, item.jan, item.store, item.note].join(" ").toLowerCase();
+      const hay = [item.name, item.maker, item.jan, item.source, item.note].join(" ").toLowerCase();
       if(hay.indexOf(keyword) === -1) return false;
     }
     return true;
@@ -268,18 +281,16 @@ function currentData(){
 }
 
 function sortData(list){
-  const col = COLUMNS.find(c => c.key === sortKey);
-  const type = col ? col.type : "str";
   return list.slice().sort((a, b) => {
     let av = a[sortKey], bv = b[sortKey];
-    if(type === "num" || type === "usd" || type === "jpy" || type === "pct"){
-      av = (av === null || av === undefined || av === "") ? -Infinity : Number(av);
-      bv = (bv === null || bv === undefined || bv === "") ? -Infinity : Number(bv);
-      return (av - bv) * sortDir;
+    if(sortKey === "release_date" || sortKey === "first_detected"){
+      av = av || (sortDir === 1 ? "9999" : "0000");
+      bv = bv || (sortDir === 1 ? "9999" : "0000");
+      return av > bv ? sortDir : (av < bv ? -sortDir : 0);
     }
-    av = (av || "").toString();
-    bv = (bv || "").toString();
-    return av.localeCompare(bv, "ja") * sortDir;
+    av = (av === null || av === undefined || av === "") ? -Infinity : Number(av);
+    bv = (bv === null || bv === undefined || bv === "") ? -Infinity : Number(bv);
+    return (av - bv) * sortDir;
   });
 }
 
@@ -299,45 +310,49 @@ function renderCattabs(){
   });
 }
 
+function renderSourceOptions(){
+  const sel = document.getElementById("sourceSelect");
+  const sources = Array.from(new Set(DATA.map(it => it.source).filter(Boolean))).sort();
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">すべて</option>` + sources.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
+  sel.value = cur;
+}
+
 function render(){
   renderCattabs();
-  renderHead();
   const filtered = sortData(currentData());
-  const tbody = document.getElementById("tbody");
+  const grid = document.getElementById("grid");
   const emptyMsg = document.getElementById("emptyMsg");
   if(filtered.length === 0){
-    tbody.innerHTML = "";
+    grid.innerHTML = "";
     emptyMsg.hidden = false;
   } else {
     emptyMsg.hidden = true;
-    tbody.innerHTML = filtered.map(item => {
-      const cells = COLUMNS.map(col => {
-        let inner = cellHtml(item, col);
-        if(col.key === "ebay_total") inner += " " + changeBadge(item);
-        return `<td class="${col.cls||""}">${inner}</td>`;
-      }).join("");
-      return `<tr class="${rowClass(item)}">${cells}</tr>`;
-    }).join("");
+    grid.innerHTML = filtered.map(cardHtml).join("");
   }
   document.getElementById("fbSummary").innerHTML = `<b>${filtered.length}</b> / ${DATA.length} 件を表示中`;
   document.getElementById("countNum").textContent = DATA.length;
 }
 
-document.getElementById("kwInput").addEventListener("input", (e) => {
-  keyword = e.target.value.trim().toLowerCase();
-  render();
-});
-document.getElementById("judgeSelect").addEventListener("change", (e) => {
-  judgeFilter = e.target.value;
+document.getElementById("kwInput").addEventListener("input", (e) => { keyword = e.target.value.trim().toLowerCase(); render(); });
+document.getElementById("sourceSelect").addEventListener("change", (e) => { sourceFilter = e.target.value; render(); });
+document.getElementById("judgeSelect").addEventListener("change", (e) => { judgeFilter = e.target.value; render(); });
+document.getElementById("sortSelect").addEventListener("change", (e) => {
+  const [key, dir] = e.target.value.split(":");
+  sortKey = key; sortDir = dir === "asc" ? 1 : -1;
   render();
 });
 document.getElementById("resetBtn").addEventListener("click", () => {
-  activeCat = ""; judgeFilter = ""; keyword = "";
+  activeCat = ""; judgeFilter = ""; sourceFilter = ""; keyword = "";
   document.getElementById("kwInput").value = "";
   document.getElementById("judgeSelect").value = "";
+  document.getElementById("sourceSelect").value = "";
+  document.getElementById("sortSelect").value = "first_detected:desc";
+  sortKey = "first_detected"; sortDir = -1;
   render();
 });
 
+renderSourceOptions();
 render();
 </script>
 </body>
